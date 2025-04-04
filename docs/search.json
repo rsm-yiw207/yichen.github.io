@@ -1,10 +1,10 @@
 [
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Yichen Wu",
+    "objectID": "blog.html",
+    "href": "blog.html",
+    "title": "My Projects",
     "section": "",
-    "text": "Here is a paragraph about me!"
+    "text": "This is project1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nThis is project 2\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "resume.html",
@@ -12,5 +12,12 @@
     "title": "Resume",
     "section": "",
     "text": "Download PDF file."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Yichen Wu",
+    "section": "",
+    "text": "Here is a paragraph about me!"
   }
 ]
