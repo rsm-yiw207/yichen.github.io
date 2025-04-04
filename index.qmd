@@ -1,0 +1,13 @@
+---
+title: "Yichen Wu"
+image: 'images/image.jpg'
+about:
+  template: jolla
+  links: 
+    - icon: envelope
+      href: mailto:yiw207@ucsd.edu
+    - icon: linkedin
+      href: https://www.linkedin.com/in/yichen-wu-b36498317/
+---
+
+Here is a paragraph about me!
