@@ -3,6 +3,6 @@ title: 'My Projects'
 listing:
   contents: blog
   type: grid
-  sort: 'date desc'
+  sort: 'title desc'
   categories: False
 ---
