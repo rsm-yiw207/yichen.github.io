@@ -15,19 +15,19 @@ This project seeks to replicate their results.
 
 ## Data
 
-### Description
-
 ```{python}
 import pandas as pd
 data = pd.read_stata('karlan_list_2007.dta')
-print(data.head())
+data.head()
 ```
+
+### Description
 
 ::: {.callout-note collapse="true"}
 ### Variable Definitions
 
 | Variable | Description |
-|-----------------------|-------------------------------------------------|
+|------------------------|------------------------------------------------|
 | `treatment` | Treatment |
 | `control` | Control |
 | `ratio` | Match ratio |
