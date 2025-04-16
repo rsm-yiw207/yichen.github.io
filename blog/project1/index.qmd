@@ -1,7 +1,8 @@
+## Project 1
 ---
 title: "A Replication of Karlan and List (2007)"
 author: "Yichen Wu"
-date: today
+date: 04/16/2025
 callout-appearance: minimal # this hides the blue "i" icon on .callout-notes
 ---
 
