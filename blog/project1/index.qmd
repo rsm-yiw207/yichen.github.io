@@ -17,13 +17,17 @@ This project seeks to replicate their results.
 
 ### Description
 
-*todo: Read the data into R/Python and describe the data*
+```{python}
+import pandas as pd
+data = pd.read_stata('karlan_list_2007.dta')
+print(data.head())
+```
 
 ::: {.callout-note collapse="true"}
 ### Variable Definitions
 
 | Variable | Description |
-|---------------------|---------------------------------------------------|
+|-----------------------|-------------------------------------------------|
 | `treatment` | Treatment |
 | `control` | Control |
 | `ratio` | Match ratio |
