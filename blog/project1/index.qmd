@@ -3,6 +3,7 @@ title: "A Replication of Karlan and List (2007)"
 author: "Yichen Wu"
 date: 04-16-2025
 callout-appearance: minimal # this hides the blue "i" icon on .callout-notes
+jupyter: py3127
 ---
 
 ## Introduction
@@ -17,6 +18,7 @@ This project seeks to replicate their results.
 
 ```{python}
 import pandas as pd
+import pyrsm as rsm
 data = pd.read_stata('karlan_list_2007.dta')
 data.head()
 ```
@@ -27,7 +29,7 @@ data.head()
 ### Variable Definitions
 
 | Variable | Description |
-|------------------------|------------------------------------------------|
+|--------------------------|----------------------------------------------|
 | `treatment` | Treatment |
 | `control` | Control |
 | `ratio` | Match ratio |
@@ -84,6 +86,9 @@ data.head()
 ### Balance Test
 
 As an ad hoc test of the randomization mechanism, I provide a series of tests that compare aspects of the treatment and control groups to assess whether they are statistically significantly different from one another.
+
+```{python}
+```
 
 *todo: test a few variables other than the key outcome variables (for example, test months since last donation) to see if the treatment and control groups are statistically significantly different at the 95% confidence level. Do each as a t-test and separately as a linear regression, and confirm you get the exact same results from both methods. When doing a t-test, use the formula in the class slides. When doing the linear regression, regress for example mrm2 on treatment and look at the estimated coefficient on the treatment variable. It might be helpful to compare parts of your analysis to Table 1 in the paper. Be sure to comment on your results (hint: why is Table 1 included in the paper).*
 

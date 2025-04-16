@@ -1,0 +1,9 @@
+{
+    "python.pythonPath": "/opt/conda/bin/python3.12.7",
+    "terminal.integrated.env.osx": {
+      "QUARTO_PYTHON": "/opt/conda/bin/python3.12.7"
+    },
+    "terminal.integrated.env.linux": {
+      "QUARTO_PYTHON": "/opt/conda/bin/python3.12.7"
+    }
+  }

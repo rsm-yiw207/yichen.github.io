@@ -9,4 +9,3 @@ about:
     - icon: linkedin
       href: https://www.linkedin.com/in/yichen-wu-b36498317/
 ---
-
