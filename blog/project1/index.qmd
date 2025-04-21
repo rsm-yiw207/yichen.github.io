@@ -4,6 +4,12 @@ author: "Yichen Wu"
 date: 04-16-2025
 callout-appearance: minimal # this hides the blue "i" icon on .callout-notes
 jupyter: py3127
+format:
+  html:
+    code-fold: true                
+execute:
+  echo: true
+  eval: true
 ---
 
 ## Introduction
@@ -21,6 +27,7 @@ import pandas as pd
 import pyrsm as rsm
 data = pd.read_stata('karlan_list_2007.dta')
 data.head()
+data.describe()
 ```
 
 ### Description
@@ -87,10 +94,64 @@ data.head()
 
 As an ad hoc test of the randomization mechanism, I provide a series of tests that compare aspects of the treatment and control groups to assess whether they are statistically significantly different from one another.
 
+#### t-test for *number of month since last donation* variable
+Pyrsm t-test
 ```{python}
+#| code-fold: true
+data['treat'] = rsm.ifelse(data.treatment == 0, 'control', 'treatment')
+no_month = rsm.basics.compare_means({"data": data}, var1="treat", var2="mrm2", alt_hyp="two-sided")
+no_month.summary(extra=True)
 ```
 
-*todo: test a few variables other than the key outcome variables (for example, test months since last donation) to see if the treatment and control groups are statistically significantly different at the 95% confidence level. Do each as a t-test and separately as a linear regression, and confirm you get the exact same results from both methods. When doing a t-test, use the formula in the class slides. When doing the linear regression, regress for example mrm2 on treatment and look at the estimated coefficient on the treatment variable. It might be helpful to compare parts of your analysis to Table 1 in the paper. Be sure to comment on your results (hint: why is Table 1 included in the paper).*
+Linear Regression
+```{python}
+lr = rsm.model.regress({'data':data},rvar='mrm2', evar='treatment')
+lr.summary(fit=False)
+```
+
+We can see from the results that the p value is 0.905, which is larger than 0.05, showing that the difference between treatment group and control group on number of month since last donation is not statistically significant. Therefroe, the data assignment is balanced.
+
+#### t-test for *highest previous contribution* variable
+Pyrsm t-test
+```{python}
+data['treat'] = rsm.ifelse(data.treatment == 0, 'control', 'treatment')
+hpa = rsm.basics.compare_means({"data": data}, var1="treat", var2="hpa", alt_hyp="two-sided")
+hpa.summary(extra=True)
+```
+
+Linear Regression
+```{python}
+lr = rsm.model.regress({'data':data},rvar='hpa', evar='treatment')
+lr.summary(fit=False)
+```
+
+We compared `hpa` (highest previous contribution) between treatment and control groups using both a t-test and a linear regression.
+
+The t-test yields a p-value of 0.332, while the OLS regression produces a p-value of 0.345. The results are nearly identical and both indicate that the difference is not statistically significant at the 5% level. This further supports that the two groups are balanced in terms of historical donation behavior.
+
+#### t-test for *number of prior donation* variable
+Pyrsm t-test
+```{python}
+data['treat'] = rsm.ifelse(data.treatment == 0, 'control', 'treatment')
+hpa = rsm.basics.compare_means({"data": data}, var1="treat", var2="freq", alt_hyp="two-sided")
+hpa.summary(extra=True)
+```
+
+Linear Regression
+```{python}
+lr = rsm.model.regress({'data':data},rvar='freq', evar='treatment')
+lr.summary(fit=False)
+```
+
+Both t-test and linear regression shows a p-value of 0.912, which is larger than 0.05. This shows that the difference is not statistically significant at the 5% level and therefore the two grpups are balanced in terms of number of prior donations.
+
+
+Comments:
+The t-tests and linear regressions conducted on pre-treatment variables such as `hpa`, `mrm2` and `freq` show no statistically significant differences between the treatment and control groups. This indicates that the randomization procedure was successful.
+
+This mirrors the role of Table 1 in the original paper by Karlan & List (2007), which presents balance checks on baseline variables to demonstrate that the groups are comparable prior to treatment.
+
+Establishing balance is essential to ensure that any observed differences in donation behavior can be credibly attributed to the experimental manipulation, rather than to underlying differences in donor characteristics.
 
 ## Experimental Results
 
@@ -98,21 +159,142 @@ As an ad hoc test of the randomization mechanism, I provide a series of tests th
 
 First, I analyze whether matched donations lead to an increased response rate of making a donation.
 
-*todo: make a barplot with two bars. Each bar is the proportion of people who donated. One bar for treatment and one bar for control.*
+```{python}
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-*todo: run a t-test between the treatment and control groups on the binary outcome of whether any charitable donation was made. Also run a bivariate linear regression that demonstrates the same finding. (It may help to confirm your calculations match Table 2a Panel A.) Report your statistical results and interpret them in the context of the experiment (e.g., if you found a difference with a small p-value or that was statistically significant at some threshold, what have you learned about human behavior? Use mostly English words, not numbers or stats, to explain your finding.)*
+sns.set(style="whitegrid", palette="muted")
 
-*todo: run a probit regression where the outcome variable is whether any charitable donation was made and the explanatory variable is assignment to treatment or control. Confirm that your results replicate Table 3 column 1 in the paper.*
+plt.figure(figsize=(6, 4))
+sns.barplot(
+    data=data,
+    x="treatment",
+    y="gave",
+    errorbar=None
+)
+
+plt.xticks([0, 1], ["Control", "Treatment"])
+plt.ylabel("Proportion Donated")
+plt.title("Donation Rate by Group")
+plt.ylim(0, 0.05)
+plt.grid(axis="y", linestyle="--", alpha=0.5)
+plt.tight_layout()
+plt.show()
+```
+
+Next, I perform a t-test for the donation between two groups.
+```{python}
+donation = rsm.basics.compare_means({"data": data}, var1="treat", var2="gave", alt_hyp="two-sided")
+donation.summary(extra=True)
+```
+From the results, we can see that the p value is 0.001, which shows that there are significant difference of the donation between control and treatment group at 5% level.
+
+Here, we run a bivariate linear regression to show the same finding.
+```{python}
+lr = rsm.model.regress({'data':data}, rvar = 'gave', evar = 'treat')
+lr.summary(fit=False)
+```
+
+The matching treatment significantly increased the likelihood of donating. The average difference was around 0.4 percentage points, and the result is statistically significant (p < 0.05). This confirms that people are more inclined to give when they know their donation will be matched by another donor. This behavior suggests a form of social influence or perceived multiplier effect, as highlighted in Karlan & List (2007).
+
+
+Finally, I perform a probit regression
+```{python}
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+
+model = smf.probit("gave ~ treatment", data=data).fit()
+print(model.summary())
+```
+
+We use a probit model to estimate the effect of the matching gift treatment on the likelihood of donating. In this model, the outcome variable `gave` is binary, taking the value 1 if a donation was made and 0 otherwise.
+
+The coefficient on the `treatment` variable is 0.087, which is statistically significant at the 5% level (p = 0.002). While probit coefficients do not have a direct probability interpretation, the positive and significant effect indicates that the treatment increased the underlying donation propensity. In substantive terms, this means that receiving a matching gift offer made people more likely to donate.
+
+This result aligns with the findings in Table 3 of Karlan and List (2007), and supports the hypothesis that even simple fundraising message frames—such as the inclusion of a match—can meaningfully shift charitable behavior.
+
 
 ### Differences between Match Rates
 
 Next, I assess the effectiveness of different sizes of matched donations on the response rate.
 
-*todo: Use a series of t-tests to test whether the size of the match ratio has an effect on whether people donate or not. For example, does the 2:1 match rate lead increase the likelihood that someone donates as compared to the 1:1 match rate? Do your results support the "figures suggest" comment the authors make on page 8?*
+Firstly, I assess the difference of donation rate between 2:1 match and 1:1 match
+```{python}
+data_2_1 = data[data["ratio"].isin([1, 2])].copy()
 
-*todo: Assess the same issue using a regression. Specifically, create the variable `ratio1` then regress `gave` on `ratio1`, `ratio2`, and `ratio3` (or alternatively, regress `gave` on the categorical variable `ratio`). Interpret the coefficients and their statistical precision.*
+data_2_1["ratio"] = pd.Categorical(data_2_1["ratio"].astype(str))
 
-*todo: Calculate the response rate difference between the 1:1 and 2:1 match ratios and the 2:1 and 3:1 ratios. Do this directly from the data, and do it by computing the differences in the fitted coefficients of the previous regression. what do you conclude regarding the effectiveness of different sizes of matched donations?*
+dif_2_1 = rsm.basics.compare_means({"data": data_2_1}, var1="ratio", var2="gave", alt_hyp="two-sided")
+dif_2_1.summary(extra=True)
+```
+
+From the results, we can see that the mean donation rate is 0.021 and 0.023 for 1:1 match and 2:1 match. However, the p-value is 0.335, which is larger than 0.05. This suggests that there is no significant difference between the donation rate of 1:1 match and 2:1 match
+
+Secondly, I assess the difference of donation rate between 3:1 match and 1:1 match
+```{python}
+data_3_1 = data[data["ratio"].isin([1, 3])].copy()
+
+data_3_1["ratio"] = pd.Categorical(data_3_1["ratio"].astype(str))
+
+dif_3_1 = rsm.basics.compare_means({"data": data_3_1}, var1="ratio", var2="gave", alt_hyp="two-sided")
+dif_3_1.summary(extra=True)
+```
+
+From the results, we can see that the mean donation rate is 0.021 and 0.023 for 1:1 match and 3:1 match. However, the p-value is 0.31, which is larger than 0.05. This suggests that there is no significant difference between the donation rate of 1:1 match and 3:1 match
+
+Finally, I assess the difference of donation rate between 3:1 match and 2:1 match
+
+```{python}
+data_3_2 = data[data["ratio"].isin([2, 3])].copy()
+
+data_3_2["ratio"] = pd.Categorical(data_3_2["ratio"].astype(str))
+
+dif_3_2 = rsm.basics.compare_means({"data": data_3_2}, var1="ratio", var2="gave", alt_hyp="two-sided")
+dif_3_2.summary(extra=True)
+```
+
+From the results, we can see that the mean donation rate is 0.023 and 0.023 for 2:1 match and 3:1 match. However, the p-value is 0.96, which is larger than 0.05. This suggests that there is no significant difference between the donation rate of 2:1 match and 3:1 match
+
+In conclusion, the results of these t-test support the authors comments that 'the match threshold does not had a meaningful influence on behavior.'
+
+Alternatively, I assess the same issue using a regression method
+```{python}
+data_1_2_3 = data[data["ratio"].isin([1, 2, 3])].copy()
+
+data_1_2_3["ratio"] = pd.Categorical(data_1_2_3["ratio"].astype(str))
+
+lr = rsm.model.regress({'data': data_1_2_3}, rvar='gave', evar='ratio')
+lr.summary(fit = False)
+```
+
+We estimate a linear regression to compare the donation rates across different match ratios. The baseline group is the 1:1 match. The coefficients on the 2:1 and 3:1 match levels are both positive (0.002), suggesting slightly higher donation rates compared to the 1:1 group.
+
+However, both coefficients are not statistically significant (p > 0.3), indicating that these differences are likely due to random chance. These findings align with the main result in Karlan & List (2007): increasing the match ratio does not significantly increase the likelihood of donation.
+
+Here, we calculate the response rate difference between three match groups
+```{python}
+df_ratio = data[data["ratio"].isin([1, 2, 3])].copy()
+
+rate_by_ratio = df_ratio.groupby("ratio", observed=True)["gave"].mean()
+
+diff_2_vs_1 = rate_by_ratio[2] - rate_by_ratio[1]
+diff_3_vs_2 = rate_by_ratio[3] - rate_by_ratio[2]
+
+print(f"Response rate 2:1 - 1:1: {diff_2_vs_1:.4f}")
+print(f"Response rate 3:1 - 2:1: {diff_3_vs_2:.4f}")
+```
+
+We compute the difference in donation rates across match ratios directly from the data.
+
+The donation rate increases slightly from the 1:1 match group to the 2:1 match group, with a difference of 0.19 percentage points. However, the increase from 2:1 to 3:1 is almost zero (0.01 percentage points). These marginal differences are extremely small and not statistically meaningful.
+
+This suggests that while the presence of a match offer increases donation probability, increasing the match ratio beyond 1:1 offers no additional benefit in terms of donor participation. This finding is consistent with the conclusions in Karlan & List (2007).
+
+From the coefficients of the previous regression, we can see that 
+the results closely mirror the direct comparisons of donation rates. The 2:1 group has a slightly higher donation rate than the 1:1 group, but the difference is small (about 0.002) and statistically insignificant (p > 0.3). The difference between 3:1 and 2:1 is nearly zero.
+
+These findings confirm that more generous match ratios do not lead to meaningfully higher response rates, consistent with the main conclusion of Karlan & List (2007). A basic 1:1 match is sufficient to activate the behavioral response.
+
 
 ### Size of Charitable Contribution
 
