@@ -9,6 +9,5 @@ about:
     - icon: linkedin
       href: https://www.linkedin.com/in/yichen-wu-b36498317/
 ---
-MSc Business Analytics 25' @UCSD
-Ex- Supply Chain Analyst @ BASF @Howe Robinson
----
+
+MSc Business Analytics 25' @UCSD Ex- Supply Chain Analyst \@ BASF @Howe Robinson ---
