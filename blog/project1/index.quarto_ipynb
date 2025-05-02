@@ -32,7 +32,7 @@
         "\n",
         "## Data"
       ],
-      "id": "267f9735"
+      "id": "bd9a60c5"
     },
     {
       "cell_type": "code",
@@ -44,7 +44,7 @@
         "data.head()\n",
         "data.describe()"
       ],
-      "id": "32e11902",
+      "id": "24db5c33",
       "execution_count": null,
       "outputs": []
     },
@@ -120,7 +120,7 @@
         "\n",
         "Pyrsm t-test"
       ],
-      "id": "827a8b59"
+      "id": "f294aae7"
     },
     {
       "cell_type": "code",
@@ -131,7 +131,7 @@
         "no_month = rsm.basics.compare_means({\"data\": data}, var1=\"treat\", var2=\"mrm2\", alt_hyp=\"two-sided\")\n",
         "no_month.summary(extra=True)"
       ],
-      "id": "4889798f",
+      "id": "bc0d23d0",
       "execution_count": null,
       "outputs": []
     },
@@ -141,7 +141,7 @@
       "source": [
         "Linear Regression"
       ],
-      "id": "8f558d8f"
+      "id": "01c302da"
     },
     {
       "cell_type": "code",
@@ -150,7 +150,7 @@
         "lr = rsm.model.regress({'data':data},rvar='mrm2', evar='treatment')\n",
         "lr.summary(fit=False)"
       ],
-      "id": "e1ea9e14",
+      "id": "d2374164",
       "execution_count": null,
       "outputs": []
     },
@@ -164,7 +164,7 @@
         "\n",
         "Pyrsm t-test"
       ],
-      "id": "c179aa6f"
+      "id": "48ef2ed6"
     },
     {
       "cell_type": "code",
@@ -174,7 +174,7 @@
         "hpa = rsm.basics.compare_means({\"data\": data}, var1=\"treat\", var2=\"hpa\", alt_hyp=\"two-sided\")\n",
         "hpa.summary(extra=True)"
       ],
-      "id": "6d2620c7",
+      "id": "6882c5c4",
       "execution_count": null,
       "outputs": []
     },
@@ -184,7 +184,7 @@
       "source": [
         "Linear Regression"
       ],
-      "id": "3bbd9ea1"
+      "id": "d4fcf069"
     },
     {
       "cell_type": "code",
@@ -193,7 +193,7 @@
         "lr = rsm.model.regress({'data':data},rvar='hpa', evar='treatment')\n",
         "lr.summary(fit=False)"
       ],
-      "id": "19fdc6b0",
+      "id": "a3b0eb74",
       "execution_count": null,
       "outputs": []
     },
@@ -209,7 +209,7 @@
         "\n",
         "Pyrsm t-test"
       ],
-      "id": "9b3cea12"
+      "id": "f6d5b363"
     },
     {
       "cell_type": "code",
@@ -219,7 +219,7 @@
         "hpa = rsm.basics.compare_means({\"data\": data}, var1=\"treat\", var2=\"freq\", alt_hyp=\"two-sided\")\n",
         "hpa.summary(extra=True)"
       ],
-      "id": "5f11726e",
+      "id": "3124c846",
       "execution_count": null,
       "outputs": []
     },
@@ -229,7 +229,7 @@
       "source": [
         "Linear Regression"
       ],
-      "id": "b8df6704"
+      "id": "0d3b93e1"
     },
     {
       "cell_type": "code",
@@ -238,7 +238,7 @@
         "lr = rsm.model.regress({'data':data},rvar='freq', evar='treatment')\n",
         "lr.summary(fit=False)"
       ],
-      "id": "545cfb62",
+      "id": "30f27b95",
       "execution_count": null,
       "outputs": []
     },
@@ -260,7 +260,7 @@
         "\n",
         "First, I analyze whether matched donations lead to an increased response rate of making a donation."
       ],
-      "id": "482313ba"
+      "id": "9fa33e99"
     },
     {
       "cell_type": "code",
@@ -287,7 +287,7 @@
         "plt.tight_layout()\n",
         "plt.show()"
       ],
-      "id": "3ac1dbc0",
+      "id": "d9010751",
       "execution_count": null,
       "outputs": []
     },
@@ -299,7 +299,7 @@
         "\n",
         "Next, I perform a t-test for the donation between two groups."
       ],
-      "id": "19436692"
+      "id": "0b2ab781"
     },
     {
       "cell_type": "code",
@@ -308,7 +308,7 @@
         "donation = rsm.basics.compare_means({\"data\": data}, var1=\"treat\", var2=\"gave\", alt_hyp=\"two-sided\")\n",
         "donation.summary(extra=True)"
       ],
-      "id": "c1b2d96b",
+      "id": "ad01b207",
       "execution_count": null,
       "outputs": []
     },
@@ -322,7 +322,7 @@
         "\n",
         "Here, we run a bivariate linear regression to show the same finding."
       ],
-      "id": "4d2764b9"
+      "id": "215e23ef"
     },
     {
       "cell_type": "code",
@@ -331,7 +331,7 @@
         "lr = rsm.model.regress({'data':data}, rvar = 'gave', evar = 'treat')\n",
         "lr.summary(fit=False)"
       ],
-      "id": "aad2e565",
+      "id": "760ee2dd",
       "execution_count": null,
       "outputs": []
     },
@@ -345,7 +345,7 @@
         "\n",
         "Finally, I perform a probit regression"
       ],
-      "id": "f123583b"
+      "id": "a520a1c2"
     },
     {
       "cell_type": "code",
@@ -357,7 +357,7 @@
         "model = smf.probit(\"gave ~ treatment\", data=data).fit()\n",
         "print(model.summary())"
       ],
-      "id": "8e4e0733",
+      "id": "23a01f4f",
       "execution_count": null,
       "outputs": []
     },
@@ -379,7 +379,7 @@
         "\n",
         "Firstly, I assess the difference of donation rate between 2:1 match and 1:1 match"
       ],
-      "id": "b8279c9e"
+      "id": "f9fc99b3"
     },
     {
       "cell_type": "code",
@@ -392,7 +392,7 @@
         "dif_2_1 = rsm.basics.compare_means({\"data\": data_2_1}, var1=\"ratio\", var2=\"gave\", alt_hyp=\"two-sided\")\n",
         "dif_2_1.summary(extra=True)"
       ],
-      "id": "cebf4d1b",
+      "id": "769c382f",
       "execution_count": null,
       "outputs": []
     },
@@ -406,7 +406,7 @@
         "\n",
         "Secondly, I assess the difference of donation rate between 3:1 match and 1:1 match"
       ],
-      "id": "3de40f19"
+      "id": "b68c44a1"
     },
     {
       "cell_type": "code",
@@ -419,7 +419,7 @@
         "dif_3_1 = rsm.basics.compare_means({\"data\": data_3_1}, var1=\"ratio\", var2=\"gave\", alt_hyp=\"two-sided\")\n",
         "dif_3_1.summary(extra=True)"
       ],
-      "id": "f16d64e9",
+      "id": "2c245fc9",
       "execution_count": null,
       "outputs": []
     },
@@ -433,7 +433,7 @@
         "\n",
         "Finally, I assess the difference of donation rate between 3:1 match and 2:1 match"
       ],
-      "id": "9abdb4e5"
+      "id": "8bf5e68d"
     },
     {
       "cell_type": "code",
@@ -446,7 +446,7 @@
         "dif_3_2 = rsm.basics.compare_means({\"data\": data_3_2}, var1=\"ratio\", var2=\"gave\", alt_hyp=\"two-sided\")\n",
         "dif_3_2.summary(extra=True)"
       ],
-      "id": "2ffb83c9",
+      "id": "045fb628",
       "execution_count": null,
       "outputs": []
     },
@@ -462,7 +462,7 @@
         "\n",
         "Alternatively, I assess the same issue using a regression method"
       ],
-      "id": "8f48ab28"
+      "id": "e0c22be0"
     },
     {
       "cell_type": "code",
@@ -475,7 +475,7 @@
         "lr = rsm.model.regress({'data': data_1_2_3}, rvar='gave', evar='ratio')\n",
         "lr.summary(fit = False)"
       ],
-      "id": "76458980",
+      "id": "12af8e6a",
       "execution_count": null,
       "outputs": []
     },
@@ -491,7 +491,7 @@
         "\n",
         "Here, we calculate the response rate difference between three match groups"
       ],
-      "id": "a7946db2"
+      "id": "43c9ba80"
     },
     {
       "cell_type": "code",
@@ -507,7 +507,7 @@
         "print(f\"Response rate 2:1 - 1:1: {diff_2_vs_1:.4f}\")\n",
         "print(f\"Response rate 3:1 - 2:1: {diff_3_vs_2:.4f}\")"
       ],
-      "id": "b99e2ddb",
+      "id": "9966f329",
       "execution_count": null,
       "outputs": []
     },
@@ -531,7 +531,7 @@
         "\n",
         "#### Pyrsm t-test for `amount` and `treatment` variable"
       ],
-      "id": "c89ce268"
+      "id": "bab33f54"
     },
     {
       "cell_type": "code",
@@ -540,7 +540,7 @@
         "treat = rsm.basics.compare_means({'data':data}, var1 = 'treat', var2 = 'amount', alt_hyp=\"two-sided\")\n",
         "treat.summary()"
       ],
-      "id": "b41167ef",
+      "id": "dff5e4fb",
       "execution_count": null,
       "outputs": []
     },
@@ -556,7 +556,7 @@
         "\n",
         "Next, I analyze the effect of the size of matched donation on the size of the charitable contribution for those who make actual donation"
       ],
-      "id": "d91e1e95"
+      "id": "11cdc1ee"
     },
     {
       "cell_type": "code",
@@ -566,7 +566,7 @@
         "treat_donate = rsm.basics.compare_means({'donate_group':donation_group}, var1 = 'treat', var2 = 'amount', alt_hyp = 'two-sided')\n",
         "treat_donate.summary()"
       ],
-      "id": "fbb0d818",
+      "id": "03069f16",
       "execution_count": null,
       "outputs": []
     },
@@ -582,7 +582,7 @@
         "\n",
         "Furthermore, the treatment factor does **not have a strong causal interpretation**, because conditional-on-giving is a **post-treatment selection**. That is, once we restrict the sample to givers, we may violate random assignment — the treatment and control groups are no longer comparable within this restricted sample."
       ],
-      "id": "9f27123b"
+      "id": "16749a28"
     },
     {
       "cell_type": "code",
@@ -616,7 +616,7 @@
         "plt.tight_layout()\n",
         "plt.show()"
       ],
-      "id": "2060d7ab",
+      "id": "5917e2c1",
       "execution_count": null,
       "outputs": []
     },
@@ -636,7 +636,7 @@
         "\n",
         "### Law of Large Numbers"
       ],
-      "id": "ce680cfc"
+      "id": "b3bc0321"
     },
     {
       "cell_type": "code",
@@ -669,7 +669,7 @@
         "plt.tight_layout()\n",
         "plt.show()"
       ],
-      "id": "1cf1c698",
+      "id": "c35e8181",
       "execution_count": null,
       "outputs": []
     },
@@ -687,7 +687,7 @@
         "\n",
         "Each of the four plots below shows the distribution of 1000 simulated differences in donation rates between treatment and control groups, at different sample sizes (50, 200, 500, 1000). As sample size increases, the distribution becomes narrower and more centered around the true difference of 0.004, illustrating the Central Limit Theorem in practice."
       ],
-      "id": "aefcbc4b"
+      "id": "7876b491"
     },
     {
       "cell_type": "code",
@@ -720,7 +720,7 @@
         "    plt.tight_layout()\n",
         "    plt.show()"
       ],
-      "id": "c2bd7030",
+      "id": "103f7e9c",
       "execution_count": null,
       "outputs": []
     }

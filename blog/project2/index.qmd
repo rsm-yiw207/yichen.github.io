@@ -31,6 +31,7 @@ blueprinty.head(5)
 ```
 
 #### Histograms of patents
+
 ```{python}
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -54,6 +55,7 @@ The bar chart compares the average number of patents between customers and non-c
 Blueprinty customers are not selected at random. It may be important to account for systematic differences in the age and regional location of customers vs non-customers.
 
 #### Comparison of regions by customer status
+
 ```{python}
 region_counts = blueprinty.groupby(["region", "iscustomer"]).size().reset_index(name="count")
 
@@ -72,8 +74,8 @@ plt.show()
 
 The distribution of firms by region and customer status reveals a clear pattern: customer firms are highly concentrated in the Northeast, whereas other regions such as the Midwest, South, and Southwest are dominated by non-customer firms. This suggests that customers may be geographically concentrated, possibly reflecting regional hubs for innovation or stronger commercial ties in the Northeast.
 
-
 #### Comparison of ages by customer status
+
 ```{python}
 mean_ages = blueprinty.groupby("iscustomer")["age"].mean().reset_index()
 mean_ages["Customer Status"] = mean_ages["iscustomer"].map({0: "Non-Customer", 1: "Customer"})
@@ -88,26 +90,94 @@ plt.show()
 
 The chart illustrates that customer firms are, on average, slightly older than non-customer firms. While the difference is modest, it suggests that firms who become customers may tend to be more established or mature.
 
-
 ### Estimation of Simple Poisson Model
 
 Since our outcome variable of interest can only be small integer values per a set unit of time, we can use a Poisson density to model the number of patents awarded to each engineering firm over the last 5 years. We start by estimating a simple Poisson model via Maximum Likelihood.
 
-*todo: Write down mathematically the likelihood for* $Y \sim \text{Poisson}(\lambda)$. Note that $f(Y|\lambda) = e^{-\lambda}\lambda^Y/Y!$.
+#### likelihood for\* $Y \sim \text{Poisson}(\lambda)$. Note that $f(Y|\lambda) = e^{-\lambda}\lambda^Y/Y!$.
 
-*todo: Code the likelihood (or log-likelihood) function for the Poisson model. This is a function of lambda and Y. For example:*
+Assume we observe data $Y_1, Y_2, ..., Y_n$ independently from a Poisson distribution:
 
-```         
-poisson_loglikelihood <- function(lambda, Y){
-   ...
-}
+$$
+P(Y_i = y_i) = \frac{e^{-\lambda} \lambda^{y_i}}{y_i!}
+$$
+
+The likelihood function is:
+
+$$
+\mathcal{L}(\lambda) = \prod_{i=1}^{n} \frac{e^{-\lambda} \lambda^{y_i}}{y_i!}
+$$
+
+#### This is a function of lambda and Y
+
+```{python}
+import numpy as np
+from scipy.optimize import minimize
+from scipy.special import gammaln 
+def log_likelihood_poisson(lmbda, y):
+    if lmbda <= 0:
+        return -np.inf
+    n = len(y)
+    return -n * lmbda + np.sum(y) * np.log(lmbda) - np.sum(gammaln(y + 1))
 ```
 
-*todo: Use your function to plot lambda on the horizontal axis and the likelihood (or log-likelihood) on the vertical axis for a range of lambdas (use the observed number of patents as the input for Y).*
+#### Plot of lambda and likelihood *(use the observed number of patents as the input for Y)*
 
-*todo: If you're feeling mathematical, take the first derivative of your likelihood or log-likelihood, set it equal to zero and solve for lambda. You will find lambda_mle is Ybar, which "feels right" because the mean of a Poisson distribution is lambda.*
+```{python}
+Y = blueprinty["patents"].dropna().values
+lambdas = np.linspace(0.01, 10, 300)
+logliks = [log_likelihood_poisson(lmbda, Y) for lmbda in lambdas]
 
-*todo: Find the MLE by optimizing your likelihood function with optim() in R or sp.optimize() in Python.*
+plt.figure(figsize=(8, 4))
+plt.plot(lambdas, logliks, color="blue")
+plt.axvline(np.mean(Y), color="red", linestyle="--", label=f"Sample mean = {np.mean(Y):.2f}")
+plt.title("Log-Likelihood of Poisson Model vs. λ")
+plt.xlabel("λ")
+plt.ylabel("Log-Likelihood")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+```
+
+#### Using first derivative to solve lambda
+
+To estimate $\lambda$ in the Poisson model, we begin by writing the log-likelihood function:
+
+$$
+\ell(\lambda) = -n\lambda + \left( \sum_{i=1}^{n} y_i \right) \log \lambda - \sum_{i=1}^{n} \log y_i!
+$$
+
+Taking the derivative with respect to $\lambda$:
+
+$$
+\frac{d\ell}{d\lambda} = -n + \frac{\sum y_i}{\lambda}
+$$
+
+Setting the derivative equal to zero:
+
+$$
+-n + \frac{\sum y_i}{\lambda} = 0 \Rightarrow \hat{\lambda} = \frac{1}{n} \sum y_i
+$$
+
+Thus, the MLE of $\lambda$ is the sample mean.
+
+#### Using scipy.optimize to find MLE
+
+```{python}
+initial_guess = [1.0]
+
+def neg_log_likelihood_poisson(lmbda, y):
+  if lmbda <= 0:
+        return -np.inf
+  n = len(y)
+  return -(-n * lmbda + np.sum(y) * np.log(lmbda) - np.sum(gammaln(y + 1)))
+result = minimize(neg_log_likelihood_poisson, x0=initial_guess, args=(Y,), bounds=[(1e-6, None)])
+
+lambda_mle = result.x[0]
+print(f"MLE for λ: {lambda_mle:.4f}")
+print(f"Sample mean: {np.mean(Y):.4f}")
+```
 
 ### Estimation of Poisson Regression Model
 
@@ -115,19 +185,116 @@ Next, we extend our simple Poisson model to a Poisson Regression Model such that
 
 *todo: Update your likelihood or log-likelihood function with an additional argument to take in a covariate matrix X. Also change the parameter of the model from lambda to the beta vector. In this model, lambda must be a positive number, so we choose the inverse link function g_inv() to be exp() so that* $\lambda_i = e^{X_i'\beta}$. *For example:*
 
-```         
-poisson_regression_likelihood <- function(beta, Y, X){
-   ...
-}
+```{python}
+def poisson_regression_likelihood(beta, Y, X):
+  eta = X @ beta              
+  lambdas = np.exp(eta)       
+  loglik = -np.sum(lambdas) + np.sum(y * eta) - np.sum(gammaln(y + 1))
+  return loglik               
 ```
 
-*todo: Use your function along with R's optim() or Python's sp.optimize() to find the MLE vector and the Hessian of the Poisson model with covariates. Specifically, the first column of X should be all 1's to enable a constant term in the model, and the subsequent columns should be age, age squared, binary variables for all but one of the regions, and the binary customer variable. Use the Hessian to find standard errors of the beta parameter estimates and present a table of coefficients and standard errors.*
+#### Using scipy.optimize to find the MLE
 
-*todo: Check your results using R's glm() function or Python sm.GLM() function.*
+```{python}
+from scipy.optimize import minimize
+import numpy as np
+import pandas as pd
+from scipy.special import gammaln
 
-*todo: Interpret the results.*
+def neg_poisson_regression_likelihood(beta, X, y):
+    eta = np.dot(X, beta)
+    eta = np.clip(eta, -20, 20)
+    lambdas = np.exp(eta)
+    loglik = -np.sum(lambdas) + np.dot(y, eta) - np.sum(gammaln(y + 1))
+    return -loglik
 
-*todo: What do you conclude about the effect of Blueprinty's software on patent success? Because the beta coefficients are not directly interpretable, it may help to create two fake datasets: X_0 and X_1 where X_0 is the X data but with iscustomer=0 for every observation and X_1 is the X data but with iscustomer=1 for every observation. Then, use X_0 and your fitted model to get the vector of predicted number of patents (y_pred_0) for every firm in the dataset, and use X_1 to get Y_pred_1 for every firm. Then subtract y_pred_1 minus y_pred_0 and take the average of that vector of differences.*
+blueprinty["age_squared"] = blueprinty["age"] ** 2
+
+from sklearn.preprocessing import StandardScaler
+numeric_cols = ["age", "age_squared", "iscustomer"]
+scaler = StandardScaler()
+blueprinty[numeric_cols] = scaler.fit_transform(blueprinty[numeric_cols])
+
+region_dummies = pd.get_dummies(blueprinty["region"], drop_first=True)
+
+X = pd.concat([
+    pd.Series(1.0, index=blueprinty.index, name="Intercept"),
+    blueprinty[["age", "age_squared"]],
+    region_dummies,
+    blueprinty[["iscustomer"]]
+], axis=1)
+
+X_names = X.columns.tolist()
+X = X.astype(float).values
+y = blueprinty["patents"].astype(float).values
+
+init_beta = np.zeros(X.shape[1])
+
+result = minimize(neg_poisson_regression_likelihood, x0=init_beta, args=(X,y), method="L-BFGS-B")
+beta_hat = result.x
+hessian_inv_mat = result.hess_inv.todense() 
+standard_errors = np.sqrt(np.diag(hessian_inv_mat))
+
+coef_table = pd.DataFrame({
+    "Coefficient": beta_hat,
+    "Std. Error": standard_errors
+}, index=X_names)
+
+print(coef_table.round(4))
+```
+
+#### Using Python sm.GLM()
+```{python}
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+
+model_std = smf.glm(
+    "patents ~ age + age_squared + C(region) + iscustomer",
+    data=blueprinty, 
+    family=sm.families.Poisson()
+).fit()
+
+print(model_std.summary())
+```
+
+
+We fit a Poisson regression model to estimate the number of patents awarded to firms based on age, customer status, and region.
+
+The coefficient on age is significantly positive, while age squared is significantly negative, suggesting a non-linear (inverted-U) relationship between firm age and patenting activity. Firms that are customers of Blueprinty also tend to have significantly more patents.
+
+Regional differences, however, do not appear to be statistically significant, indicating that patent activity is not strongly driven by firm location.
+
+
+#### The average difference between customer and non-customer
+```{python}
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+import pandas as pd
+
+model = smf.glm(
+    "patents ~ age + age_squared + C(region) + iscustomer",
+    data=blueprinty,
+    family=sm.families.Poisson()
+).fit()
+
+X_0 = blueprinty.copy()
+X_1 = blueprinty.copy()
+X_0["iscustomer"] = 0
+X_1["iscustomer"] = 1
+
+y_pred_0 = model.predict(X_0)
+y_pred_1 = model.predict(X_1)
+
+diff = y_pred_1 - y_pred_0
+avg_effect = diff.mean()
+
+print(f"Average effect of being a customer: {avg_effect:.4f}")
+```
+
+To evaluate the effect of Blueprinty's software on patenting success, we simulated predicted patent counts under two scenarios: assuming each firm is not a customer, and assuming it is a customer. Holding all other variables constant, we find that becoming a Blueprinty customer increases the expected number of patents by **approximately 0.37** on average.
+
+This suggests that Blueprinty's product has a meaningful and positive association with innovation outcomes across firms.
+
 
 ## AirBnB Case Study
 
