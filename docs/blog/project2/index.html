@@ -241,7 +241,7 @@ window.Quarto = {
 </section>
 <section id="data" class="level3">
 <h3 class="anchored" data-anchor-id="data">Data</h3>
-<div id="07f6043d" class="cell" data-execution_count="1">
+<div id="8babb792" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pyrsm <span class="im">as</span> rsm</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>blueprinty <span class="op">=</span> pd.read_csv(<span class="st">'blueprinty.csv'</span>)</span>
@@ -305,7 +305,7 @@ window.Quarto = {
 </div>
 <section id="histograms-of-patents" class="level4">
 <h4 class="anchored" data-anchor-id="histograms-of-patents">Histograms of patents</h4>
-<div id="91dc242c" class="cell" data-execution_count="2">
+<div id="114bc693" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -322,7 +322,7 @@ window.Quarto = {
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/tmp/ipykernel_62184/3159558304.py:9: FutureWarning:
+<pre><code>/tmp/ipykernel_32331/3159558304.py:9: FutureWarning:
 
 
 
@@ -343,7 +343,7 @@ Passing `palette` without assigning `hue` is deprecated and will be removed in v
 </section>
 <section id="comparison-of-regions-by-customer-status" class="level4">
 <h4 class="anchored" data-anchor-id="comparison-of-regions-by-customer-status">Comparison of regions by customer status</h4>
-<div id="97abbec7" class="cell" data-execution_count="3">
+<div id="4cdc291e" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>region_counts <span class="op">=</span> blueprinty.groupby([<span class="st">"region"</span>, <span class="st">"iscustomer"</span>]).size().reset_index(name<span class="op">=</span><span class="st">"count"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>region_counts[<span class="st">"Customer Status"</span>] <span class="op">=</span> region_counts[<span class="st">"iscustomer"</span>].<span class="bu">map</span>({<span class="dv">0</span>: <span class="st">"Non-Customer"</span>, <span class="dv">1</span>: <span class="st">"Customer"</span>})</span>
@@ -369,7 +369,7 @@ Passing `palette` without assigning `hue` is deprecated and will be removed in v
 </section>
 <section id="comparison-of-ages-by-customer-status" class="level4">
 <h4 class="anchored" data-anchor-id="comparison-of-ages-by-customer-status">Comparison of ages by customer status</h4>
-<div id="5b5bdec1" class="cell" data-execution_count="4">
+<div id="c0e7427a" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mean_ages <span class="op">=</span> blueprinty.groupby(<span class="st">"iscustomer"</span>)[<span class="st">"age"</span>].mean().reset_index()</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>mean_ages[<span class="st">"Customer Status"</span>] <span class="op">=</span> mean_ages[<span class="st">"iscustomer"</span>].<span class="bu">map</span>({<span class="dv">0</span>: <span class="st">"Non-Customer"</span>, <span class="dv">1</span>: <span class="st">"Customer"</span>})</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -380,7 +380,7 @@ Passing `palette` without assigning `hue` is deprecated and will be removed in v
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/tmp/ipykernel_62184/3299340969.py:5: FutureWarning:
+<pre><code>/tmp/ipykernel_32331/3299340969.py:5: FutureWarning:
 
 
 
@@ -415,7 +415,7 @@ P(Y_i = y_i) = \frac{e^{-\lambda} \lambda^{y_i}}{y_i!}
 </section>
 <section id="this-is-a-function-of-lambda-and-y" class="level4">
 <h4 class="anchored" data-anchor-id="this-is-a-function-of-lambda-and-y">This is a function of lambda and Y</h4>
-<div id="ee3619d3" class="cell" data-execution_count="5">
+<div id="b33a06a2" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.special <span class="im">import</span> gammaln </span>
@@ -428,7 +428,7 @@ P(Y_i = y_i) = \frac{e^{-\lambda} \lambda^{y_i}}{y_i!}
 </section>
 <section id="plot-of-lambda-and-likelihood-use-the-observed-number-of-patents-as-the-input-for-y" class="level4">
 <h4 class="anchored" data-anchor-id="plot-of-lambda-and-likelihood-use-the-observed-number-of-patents-as-the-input-for-y">Plot of lambda and likelihood <em>(use the observed number of patents as the input for Y)</em></h4>
-<div id="5ad4be09" class="cell" data-execution_count="6">
+<div id="4936671b" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> blueprinty[<span class="st">"patents"</span>].dropna().values</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>lambdas <span class="op">=</span> np.linspace(<span class="fl">0.01</span>, <span class="dv">10</span>, <span class="dv">300</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>logliks <span class="op">=</span> [log_likelihood_poisson(lmbda, Y) <span class="cf">for</span> lmbda <span class="kw">in</span> lambdas]</span>
@@ -470,7 +470,7 @@ P(Y_i = y_i) = \frac{e^{-\lambda} \lambda^{y_i}}{y_i!}
 </section>
 <section id="using-scipy.optimize-to-find-mle" class="level4">
 <h4 class="anchored" data-anchor-id="using-scipy.optimize-to-find-mle">Using scipy.optimize to find MLE</h4>
-<div id="5153796b" class="cell" data-execution_count="7">
+<div id="981da18e" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>initial_guess <span class="op">=</span> [<span class="fl">1.0</span>]</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> neg_log_likelihood_poisson(lmbda, y):</span>
@@ -494,7 +494,7 @@ Sample mean: 3.6847</code></pre>
 <h3 class="anchored" data-anchor-id="estimation-of-poisson-regression-model">Estimation of Poisson Regression Model</h3>
 <p>Next, we extend our simple Poisson model to a Poisson Regression Model such that <span class="math inline">\(Y_i = \text{Poisson}(\lambda_i)\)</span> where <span class="math inline">\(\lambda_i = \exp(X_i'\beta)\)</span>. The interpretation is that the success rate of patent awards is not constant across all firms (<span class="math inline">\(\lambda\)</span>) but rather is a function of firm characteristics <span class="math inline">\(X_i\)</span>. Specifically, we will use the covariates age, age squared, region, and whether the firm is a customer of Blueprinty.</p>
 <p><em>todo: Update your likelihood or log-likelihood function with an additional argument to take in a covariate matrix X. Also change the parameter of the model from lambda to the beta vector. In this model, lambda must be a positive number, so we choose the inverse link function g_inv() to be exp() so that</em> <span class="math inline">\(\lambda_i = e^{X_i'\beta}\)</span>. <em>For example:</em></p>
-<div id="6ae863ab" class="cell" data-execution_count="8">
+<div id="4fd6e737" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> poisson_regression_likelihood(beta, Y, X):</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  eta <span class="op">=</span> X <span class="op">@</span> beta              </span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  lambdas <span class="op">=</span> np.exp(eta)       </span>
@@ -503,7 +503,7 @@ Sample mean: 3.6847</code></pre>
 </div>
 <section id="using-scipy.optimize-to-find-the-mle" class="level4">
 <h4 class="anchored" data-anchor-id="using-scipy.optimize-to-find-the-mle">Using scipy.optimize to find the MLE</h4>
-<div id="c1f088b9" class="cell" data-execution_count="9">
+<div id="bced424f" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -564,7 +564,7 @@ iscustomer        0.0969      0.2682</code></pre>
 </section>
 <section id="using-python-sm.glm" class="level4">
 <h4 class="anchored" data-anchor-id="using-python-sm.glm">Using Python sm.GLM()</h4>
-<div id="16f7f3b7" class="cell" data-execution_count="10">
+<div id="3139f0f2" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -583,8 +583,8 @@ Model:                            GLM   Df Residuals:                     1492
 Model Family:                 Poisson   Df Model:                            7
 Link Function:                    Log   Scale:                          1.0000
 Method:                          IRLS   Log-Likelihood:                -3258.1
-Date:                Fri, 02 May 2025   Deviance:                       2143.3
-Time:                        16:23:03   Pearson chi2:                 2.07e+03
+Date:                Tue, 06 May 2025   Deviance:                       2143.3
+Time:                        18:55:32   Pearson chi2:                 2.07e+03
 No. Iterations:                     5   Pseudo R-squ. (CS):             0.1360
 Covariance Type:            nonrobust                                         
 ==========================================================================================
@@ -607,7 +607,7 @@ iscustomer                 0.0969      0.014      6.719      0.000       0.069  
 </section>
 <section id="the-average-difference-between-customer-and-non-customer" class="level4">
 <h4 class="anchored" data-anchor-id="the-average-difference-between-customer-and-non-customer">The average difference between customer and non-customer</h4>
-<div id="0d5171f8" class="cell" data-execution_count="11">
+<div id="24eeb7b0" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -673,8 +673,312 @@ Variable Definitions
 </div>
 </div>
 <p><em>todo: Assume the number of reviews is a good proxy for the number of bookings. Perform some exploratory data analysis to get a feel for the data, handle or drop observations with missing values on relevant variables, build one or more models (e.g., a poisson regression model for the number of bookings as proxied by the number of reviews), and interpret model coefficients to describe variation in the number of reviews as a function of the variables provided.</em></p>
+<section id="load-the-data-and-check-the-data" class="level4">
+<h4 class="anchored" data-anchor-id="load-the-data-and-check-the-data">Load the data and check the data</h4>
+<div id="89bc4a2b" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pyrsm <span class="im">as</span> rsm</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'airbnb.csv'</span>)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<div>
 
 
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Unnamed: 0</th>
+<th data-quarto-table-cell-role="th">id</th>
+<th data-quarto-table-cell-role="th">days</th>
+<th data-quarto-table-cell-role="th">last_scraped</th>
+<th data-quarto-table-cell-role="th">host_since</th>
+<th data-quarto-table-cell-role="th">room_type</th>
+<th data-quarto-table-cell-role="th">bathrooms</th>
+<th data-quarto-table-cell-role="th">bedrooms</th>
+<th data-quarto-table-cell-role="th">price</th>
+<th data-quarto-table-cell-role="th">number_of_reviews</th>
+<th data-quarto-table-cell-role="th">review_scores_cleanliness</th>
+<th data-quarto-table-cell-role="th">review_scores_location</th>
+<th data-quarto-table-cell-role="th">review_scores_value</th>
+<th data-quarto-table-cell-role="th">instant_bookable</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1</td>
+<td>2515</td>
+<td>3130</td>
+<td>4/2/2017</td>
+<td>9/6/2008</td>
+<td>Private room</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>59</td>
+<td>150</td>
+<td>9.0</td>
+<td>9.0</td>
+<td>9.0</td>
+<td>f</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2</td>
+<td>2595</td>
+<td>3127</td>
+<td>4/2/2017</td>
+<td>9/9/2008</td>
+<td>Entire home/apt</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>230</td>
+<td>20</td>
+<td>9.0</td>
+<td>10.0</td>
+<td>9.0</td>
+<td>f</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>3</td>
+<td>3647</td>
+<td>3050</td>
+<td>4/2/2017</td>
+<td>11/25/2008</td>
+<td>Private room</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>150</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>f</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>4</td>
+<td>3831</td>
+<td>3038</td>
+<td>4/2/2017</td>
+<td>12/7/2008</td>
+<td>Entire home/apt</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>89</td>
+<td>116</td>
+<td>9.0</td>
+<td>9.0</td>
+<td>9.0</td>
+<td>f</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>5</td>
+<td>4611</td>
+<td>3012</td>
+<td>4/2/2017</td>
+<td>1/2/2009</td>
+<td>Private room</td>
+<td>NaN</td>
+<td>1.0</td>
+<td>39</td>
+<td>93</td>
+<td>9.0</td>
+<td>8.0</td>
+<td>9.0</td>
+<td>t</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="check-summary-statistics-of-the-dataset" class="level4">
+<h4 class="anchored" data-anchor-id="check-summary-statistics-of-the-dataset">Check summary statistics of the dataset</h4>
+<div id="f842ee8d" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.describe().<span class="bu">round</span>(<span class="dv">2</span>))</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.info())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       Unnamed: 0           id      days  bathrooms  bedrooms     price  \
+count    40628.00     40628.00  40628.00   40468.00  40552.00  40628.00   
+mean     20314.50   9698889.00   1102.37       1.12      1.15    144.76   
+std      11728.44   5460166.00   1383.27       0.39      0.69    210.66   
+min          1.00      2515.00      1.00       0.00      0.00     10.00   
+25%      10157.75   4889868.25    542.00       1.00      1.00     70.00   
+50%      20314.50   9862877.50    996.00       1.00      1.00    100.00   
+75%      30471.25  14667893.75   1535.00       1.00      1.00    170.00   
+max      40628.00  18009669.00  42828.00       8.00     10.00  10000.00   
+
+       number_of_reviews  review_scores_cleanliness  review_scores_location  \
+count           40628.00                   30433.00                30374.00   
+mean               15.90                       9.20                    9.41   
+std                29.25                       1.12                    0.84   
+min                 0.00                       2.00                    2.00   
+25%                 1.00                       9.00                    9.00   
+50%                 4.00                      10.00                   10.00   
+75%                17.00                      10.00                   10.00   
+max               421.00                      10.00                   10.00   
+
+       review_scores_value  
+count             30372.00  
+mean                  9.33  
+std                   0.90  
+min                   2.00  
+25%                   9.00  
+50%                  10.00  
+75%                  10.00  
+max                  10.00  
+&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 40628 entries, 0 to 40627
+Data columns (total 14 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Unnamed: 0                 40628 non-null  int64  
+ 1   id                         40628 non-null  int64  
+ 2   days                       40628 non-null  int64  
+ 3   last_scraped               40628 non-null  object 
+ 4   host_since                 40593 non-null  object 
+ 5   room_type                  40628 non-null  object 
+ 6   bathrooms                  40468 non-null  float64
+ 7   bedrooms                   40552 non-null  float64
+ 8   price                      40628 non-null  int64  
+ 9   number_of_reviews          40628 non-null  int64  
+ 10  review_scores_cleanliness  30433 non-null  float64
+ 11  review_scores_location     30374 non-null  float64
+ 12  review_scores_value        30372 non-null  float64
+ 13  instant_bookable           40628 non-null  object 
+dtypes: float64(5), int64(5), object(4)
+memory usage: 4.3+ MB
+None</code></pre>
+</div>
+</div>
+</section>
+<section id="distribution-plot-of-the-dataset" class="level4">
+<h4 class="anchored" data-anchor-id="distribution-plot-of-the-dataset">Distribution plot of the dataset</h4>
+<div id="562e2cfa" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> rsm.distr_plot(data<span class="op">=</span>df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>No plot will be created for last_scraped (type object)
+No plot will be created for host_since (type object)
+No plot will be created for room_type (type object)
+No plot will be created for instant_bookable (type object)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-15-output-2.png" width="852" height="1545" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="build-models-and-check-coefficients" class="level4">
+<h4 class="anchored" data-anchor-id="build-models-and-check-coefficients">Build models and check coefficients</h4>
+<div id="6af9f3b5" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.drop(columns<span class="op">=</span>[<span class="st">"Unnamed: 0"</span>, <span class="st">"id"</span>])</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"last_scraped"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"last_scraped"</span>], errors<span class="op">=</span><span class="st">"coerce"</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"host_since"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"host_since"</span>], errors<span class="op">=</span><span class="st">"coerce"</span>)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"host_duration"</span>] <span class="op">=</span> (df[<span class="st">"last_scraped"</span>] <span class="op">-</span> df[<span class="st">"host_since"</span>]).dt.days</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"instant_bookable"</span>] <span class="op">=</span> df[<span class="st">"instant_bookable"</span>].<span class="bu">map</span>({<span class="st">"t"</span>: <span class="dv">1</span>, <span class="st">"f"</span>: <span class="dv">0</span>})</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>model_vars <span class="op">=</span> [</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"number_of_reviews"</span>, <span class="st">"price"</span>, <span class="st">"room_type"</span>, <span class="st">"bathrooms"</span>, <span class="st">"bedrooms"</span>,</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"review_scores_cleanliness"</span>, <span class="st">"review_scores_location"</span>, <span class="st">"review_scores_value"</span>,</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"instant_bookable"</span>, <span class="st">"host_duration"</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>df_model <span class="op">=</span> df[model_vars].dropna()</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>formula <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="st">number_of_reviews ~ price + C(room_type) + bathrooms + bedrooms + </span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="st">review_scores_cleanliness + review_scores_location + review_scores_value + </span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a><span class="st">instant_bookable + host_duration</span></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>poisson_model <span class="op">=</span> smf.glm(</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span>formula,</span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df_model,</span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>    family<span class="op">=</span>sm.families.Poisson()</span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>).fit()</span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(poisson_model.summary())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 Generalized Linear Model Regression Results                  
+==============================================================================
+Dep. Variable:      number_of_reviews   No. Observations:                30140
+Model:                            GLM   Df Residuals:                    30129
+Model Family:                 Poisson   Df Model:                           10
+Link Function:                    Log   Scale:                          1.0000
+Method:                          IRLS   Log-Likelihood:            -4.9041e+05
+Date:                Tue, 06 May 2025   Deviance:                   8.5945e+05
+Time:                        18:55:34   Pearson chi2:                 1.18e+06
+No. Iterations:                     6   Pseudo R-squ. (CS):             0.9655
+Covariance Type:            nonrobust                                         
+================================================================================================
+                                   coef    std err          z      P&gt;|z|      [0.025      0.975]
+------------------------------------------------------------------------------------------------
+Intercept                        2.9427      0.017    176.920      0.000       2.910       2.975
+C(room_type)[T.Private room]     0.0192      0.003      7.025      0.000       0.014       0.025
+C(room_type)[T.Shared room]     -0.1152      0.009    -13.318      0.000      -0.132      -0.098
+price                        -4.302e-05   8.27e-06     -5.199      0.000   -5.92e-05   -2.68e-05
+bathrooms                       -0.1134      0.004    -30.067      0.000      -0.121      -0.106
+bedrooms                         0.0757      0.002     37.214      0.000       0.072       0.080
+review_scores_cleanliness        0.1110      0.002     73.159      0.000       0.108       0.114
+review_scores_location          -0.0815      0.002    -50.403      0.000      -0.085      -0.078
+review_scores_value             -0.0911      0.002    -49.311      0.000      -0.095      -0.087
+instant_bookable                 0.4591      0.003    157.293      0.000       0.453       0.465
+host_duration                    0.0005   1.86e-06    280.430      0.000       0.001       0.001
+================================================================================================</code></pre>
+</div>
+</div>
+<p>The Poisson regression model reveals several significant relationships between listing characteristics and the number of reviews, which serves as a proxy for bookings. Among the most influential factors, instant bookable listings are associated with approximately 58% more reviews than those that are not, indicating the convenience of instant booking likely drives higher customer engagement. Additionally, host duration (the length of time a host has been active) shows a positive effect, where each additional day is linked to a small but consistent 0.05% increase in reviews, reflecting the importance of host experience over time.</p>
+<p>Cleanliness ratings play a strong role as well: for every one-point increase in review_scores_cleanliness, the expected number of reviews rises by 12%, underscoring how perceived cleanliness boosts customer trust and demand. Listings with more bedrooms also see more reviews, with each additional bedroom linked to an 8% increase. In contrast, more bathrooms are surprisingly associated with fewer reviews, which could reflect specific property types or customer expectations.</p>
+<p>Price has a modest negative relationship with reviews: for every $100 increase in nightly rate, the number of reviews is expected to decline by about 4%, consistent with the idea that higher prices may limit the booking volume. Interestingly, review_scores_location and review_scores_value both show negative associations with review count, suggesting that highly rated properties in these areas may rely less on volume and more on perceived quality or exclusivity.</p>
+<p>Overall, the results suggest that ease of booking, host tenure, cleanliness, and property configuration are key drivers of booking volume, while price sensitivity and certain customer ratings reflect more nuanced dynamics.</p>
+</section>
+<section id="check-multicollinearity" class="level4">
+<h4 class="anchored" data-anchor-id="check-multicollinearity">Check multicollinearity</h4>
+<div id="df5e30a1" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.stats.outliers_influence <span class="im">import</span> variance_inflation_factor</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> patsy <span class="im">import</span> dmatrices</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>formula <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="st">number_of_reviews ~ price + C(room_type) + bathrooms + bedrooms +</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="st">review_scores_cleanliness + review_scores_location + review_scores_value +</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="st">instant_bookable + host_duration</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>y, X <span class="op">=</span> dmatrices(formula, data<span class="op">=</span>df_model, return_type<span class="op">=</span><span class="st">'dataframe'</span>)</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>vif_df <span class="op">=</span> pd.DataFrame()</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>vif_df[<span class="st">"variable"</span>] <span class="op">=</span> X.columns</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>vif_df[<span class="st">"VIF"</span>] <span class="op">=</span> [variance_inflation_factor(X.values, i) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(X.shape[<span class="dv">1</span>])]</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(vif_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                        variable         VIF
+0                      Intercept  186.073058
+1   C(room_type)[T.Private room]    1.164067
+2    C(room_type)[T.Shared room]    1.048969
+3                          price    1.225282
+4                      bathrooms    1.243638
+5                       bedrooms    1.289002
+6      review_scores_cleanliness    1.626331
+7         review_scores_location    1.294107
+8            review_scores_value    1.824029
+9               instant_bookable    1.036783
+10                 host_duration    1.034359</code></pre>
+</div>
+</div>
+<p>To assess multicollinearity among the independent variables, we computed the Variance Inflation Factor (VIF) for each predictor in the Poisson regression model. All VIF values were well below the commonly accepted threshold of 5, with the highest being approximately 1.82 for review_scores_value. This suggests that there is no significant multicollinearity present among the variables.</p>
+<p>Low VIF values indicate that the predictors are not highly correlated with one another, which supports the stability and reliability of the estimated regression coefficients. Therefore, we can be confident that the individual effects of the variables on the number of reviews are being appropriately captured by the model, without distortion from redundant or highly correlated predictors.</p>
+
+
+</section>
 </section>
 </section>
 

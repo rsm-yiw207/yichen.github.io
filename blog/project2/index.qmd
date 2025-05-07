@@ -244,6 +244,7 @@ print(coef_table.round(4))
 ```
 
 #### Using Python sm.GLM()
+
 ```{python}
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
@@ -257,15 +258,14 @@ model_std = smf.glm(
 print(model_std.summary())
 ```
 
-
 We fit a Poisson regression model to estimate the number of patents awarded to firms based on age, customer status, and region.
 
 The coefficient on age is significantly positive, while age squared is significantly negative, suggesting a non-linear (inverted-U) relationship between firm age and patenting activity. Firms that are customers of Blueprinty also tend to have significantly more patents.
 
 Regional differences, however, do not appear to be statistically significant, indicating that patent activity is not strongly driven by firm location.
 
-
 #### The average difference between customer and non-customer
+
 ```{python}
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
@@ -295,7 +295,6 @@ To evaluate the effect of Blueprinty's software on patenting success, we simulat
 
 This suggests that Blueprinty's product has a meaningful and positive association with innovation outcomes across firms.
 
-
 ## AirBnB Case Study
 
 ### Introduction
@@ -323,3 +322,86 @@ AirBnB is a popular platform for booking short-term rentals. In March 2017, stud
 :::
 
 *todo: Assume the number of reviews is a good proxy for the number of bookings. Perform some exploratory data analysis to get a feel for the data, handle or drop observations with missing values on relevant variables, build one or more models (e.g., a poisson regression model for the number of bookings as proxied by the number of reviews), and interpret model coefficients to describe variation in the number of reviews as a function of the variables provided.*
+
+#### Load the data and check the data
+
+```{python}
+import pyrsm as rsm
+import pandas as pd
+
+df = pd.read_csv('airbnb.csv')
+df.head()
+```
+
+#### Check summary statistics of the dataset
+```{python}
+print(df.describe().round(2))
+print(df.info())
+```
+
+#### Distribution plot of the dataset
+```{python}
+fig = rsm.distr_plot(data=df)
+```
+
+#### Build models and check coefficients
+```{python}
+df = df.drop(columns=["Unnamed: 0", "id"])
+
+df["last_scraped"] = pd.to_datetime(df["last_scraped"], errors="coerce")
+df["host_since"] = pd.to_datetime(df["host_since"], errors="coerce")
+df["host_duration"] = (df["last_scraped"] - df["host_since"]).dt.days
+
+df["instant_bookable"] = df["instant_bookable"].map({"t": 1, "f": 0})
+
+model_vars = [
+    "number_of_reviews", "price", "room_type", "bathrooms", "bedrooms",
+    "review_scores_cleanliness", "review_scores_location", "review_scores_value",
+    "instant_bookable", "host_duration"
+]
+df_model = df[model_vars].dropna()
+
+formula = """
+number_of_reviews ~ price + C(room_type) + bathrooms + bedrooms + 
+review_scores_cleanliness + review_scores_location + review_scores_value + 
+instant_bookable + host_duration
+"""
+poisson_model = smf.glm(
+    formula=formula,
+    data=df_model,
+    family=sm.families.Poisson()
+).fit()
+
+print(poisson_model.summary())
+```
+
+The Poisson regression model reveals several significant relationships between listing characteristics and the number of reviews, which serves as a proxy for bookings. Among the most influential factors, instant bookable listings are associated with approximately 58% more reviews than those that are not, indicating the convenience of instant booking likely drives higher customer engagement. Additionally, host duration (the length of time a host has been active) shows a positive effect, where each additional day is linked to a small but consistent 0.05% increase in reviews, reflecting the importance of host experience over time.
+
+Cleanliness ratings play a strong role as well: for every one-point increase in review_scores_cleanliness, the expected number of reviews rises by 12%, underscoring how perceived cleanliness boosts customer trust and demand. Listings with more bedrooms also see more reviews, with each additional bedroom linked to an 8% increase. In contrast, more bathrooms are surprisingly associated with fewer reviews, which could reflect specific property types or customer expectations.
+
+Price has a modest negative relationship with reviews: for every $100 increase in nightly rate, the number of reviews is expected to decline by about 4%, consistent with the idea that higher prices may limit the booking volume. Interestingly, review_scores_location and review_scores_value both show negative associations with review count, suggesting that highly rated properties in these areas may rely less on volume and more on perceived quality or exclusivity.
+
+Overall, the results suggest that ease of booking, host tenure, cleanliness, and property configuration are key drivers of booking volume, while price sensitivity and certain customer ratings reflect more nuanced dynamics.
+
+#### Check multicollinearity
+```{python}
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+from patsy import dmatrices
+
+formula = """
+number_of_reviews ~ price + C(room_type) + bathrooms + bedrooms +
+review_scores_cleanliness + review_scores_location + review_scores_value +
+instant_bookable + host_duration
+"""
+y, X = dmatrices(formula, data=df_model, return_type='dataframe')
+
+vif_df = pd.DataFrame()
+vif_df["variable"] = X.columns
+vif_df["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
+
+print(vif_df)
+```
+
+To assess multicollinearity among the independent variables, we computed the Variance Inflation Factor (VIF) for each predictor in the Poisson regression model. All VIF values were well below the commonly accepted threshold of 5, with the highest being approximately 1.82 for review_scores_value. This suggests that there is no significant multicollinearity present among the variables.
+
+Low VIF values indicate that the predictors are not highly correlated with one another, which supports the stability and reliability of the estimated regression coefficients. Therefore, we can be confident that the individual effects of the variables on the number of reviews are being appropriately captured by the model, without distortion from redundant or highly correlated predictors.

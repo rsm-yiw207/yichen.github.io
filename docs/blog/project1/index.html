@@ -219,7 +219,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="data" class="level2">
 <h2 class="anchored" data-anchor-id="data">Data</h2>
-<div id="2e5f05cf" class="cell" data-execution_count="1">
+<div id="4dec4c80" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pyrsm <span class="im">as</span> rsm</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.read_stata(<span class="st">'karlan_list_2007.dta'</span>)</span>
@@ -698,7 +698,7 @@ Variable Definitions
 <section id="t-test-for-number-of-month-since-last-donation-variable" class="level4">
 <h4 class="anchored" data-anchor-id="t-test-for-number-of-month-since-last-donation-variable">t-test for <em>number of month since last donation</em> variable</h4>
 <p>Pyrsm t-test</p>
-<div id="e03027e3" class="cell" data-execution_count="2">
+<div id="1feabf8a" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data[<span class="st">'treat'</span>] <span class="op">=</span> rsm.ifelse(data.treatment <span class="op">==</span> <span class="dv">0</span>, <span class="st">'control'</span>, <span class="st">'treatment'</span>)</span>
@@ -722,7 +722,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 </div>
 <p>Linear Regression</p>
-<div id="e0e45570" class="cell" data-execution_count="3">
+<div id="01b57787" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>lr <span class="op">=</span> rsm.model.regress({<span class="st">'data'</span>:data},rvar<span class="op">=</span><span class="st">'mrm2'</span>, evar<span class="op">=</span><span class="st">'treatment'</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>lr.summary(fit<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -745,7 +745,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <section id="t-test-for-highest-previous-contribution-variable" class="level4">
 <h4 class="anchored" data-anchor-id="t-test-for-highest-previous-contribution-variable">t-test for <em>highest previous contribution</em> variable</h4>
 <p>Pyrsm t-test</p>
-<div id="aff60968" class="cell" data-execution_count="4">
+<div id="da6f4426" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>data[<span class="st">'treat'</span>] <span class="op">=</span> rsm.ifelse(data.treatment <span class="op">==</span> <span class="dv">0</span>, <span class="st">'control'</span>, <span class="st">'treatment'</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>hpa <span class="op">=</span> rsm.basics.compare_means({<span class="st">"data"</span>: data}, var1<span class="op">=</span><span class="st">"treat"</span>, var2<span class="op">=</span><span class="st">"hpa"</span>, alt_hyp<span class="op">=</span><span class="st">"two-sided"</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>hpa.summary(extra<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -766,7 +766,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 </div>
 <p>Linear Regression</p>
-<div id="ef2b15c9" class="cell" data-execution_count="5">
+<div id="da7a98be" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>lr <span class="op">=</span> rsm.model.regress({<span class="st">'data'</span>:data},rvar<span class="op">=</span><span class="st">'hpa'</span>, evar<span class="op">=</span><span class="st">'treatment'</span>)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>lr.summary(fit<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -790,7 +790,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <section id="t-test-for-number-of-prior-donation-variable" class="level4">
 <h4 class="anchored" data-anchor-id="t-test-for-number-of-prior-donation-variable">t-test for <em>number of prior donation</em> variable</h4>
 <p>Pyrsm t-test</p>
-<div id="434f50a3" class="cell" data-execution_count="6">
+<div id="1c4b6e71" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>data[<span class="st">'treat'</span>] <span class="op">=</span> rsm.ifelse(data.treatment <span class="op">==</span> <span class="dv">0</span>, <span class="st">'control'</span>, <span class="st">'treatment'</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>hpa <span class="op">=</span> rsm.basics.compare_means({<span class="st">"data"</span>: data}, var1<span class="op">=</span><span class="st">"treat"</span>, var2<span class="op">=</span><span class="st">"freq"</span>, alt_hyp<span class="op">=</span><span class="st">"two-sided"</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>hpa.summary(extra<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -811,7 +811,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 </div>
 <p>Linear Regression</p>
-<div id="f7a05ee7" class="cell" data-execution_count="7">
+<div id="716218a7" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>lr <span class="op">=</span> rsm.model.regress({<span class="st">'data'</span>:data},rvar<span class="op">=</span><span class="st">'freq'</span>, evar<span class="op">=</span><span class="st">'treatment'</span>)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>lr.summary(fit<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -841,7 +841,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <section id="charitable-contribution-made" class="level3">
 <h3 class="anchored" data-anchor-id="charitable-contribution-made">Charitable Contribution Made</h3>
 <p>First, I analyze whether matched donations lead to an increased response rate of making a donation.</p>
-<div id="2340cbcb" class="cell" data-execution_count="8">
+<div id="7eb5d2bc" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -873,7 +873,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <section id="t-test" class="level4">
 <h4 class="anchored" data-anchor-id="t-test">t-test</h4>
 <p>Next, I perform a t-test for the donation between two groups.</p>
-<div id="ce293d65" class="cell" data-execution_count="9">
+<div id="9dea4fcd" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>donation <span class="op">=</span> rsm.basics.compare_means({<span class="st">"data"</span>: data}, var1<span class="op">=</span><span class="st">"treat"</span>, var2<span class="op">=</span><span class="st">"gave"</span>, alt_hyp<span class="op">=</span><span class="st">"two-sided"</span>)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>donation.summary(extra<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -897,7 +897,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <section id="bivariate-linear-regression" class="level4">
 <h4 class="anchored" data-anchor-id="bivariate-linear-regression">Bivariate linear regression</h4>
 <p>Here, we run a bivariate linear regression to show the same finding.</p>
-<div id="5e0c99d0" class="cell" data-execution_count="10">
+<div id="36f0da1a" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>lr <span class="op">=</span> rsm.model.regress({<span class="st">'data'</span>:data}, rvar <span class="op">=</span> <span class="st">'gave'</span>, evar <span class="op">=</span> <span class="st">'treat'</span>)</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>lr.summary(fit<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -920,7 +920,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <section id="probit-regression" class="level4">
 <h4 class="anchored" data-anchor-id="probit-regression">Probit regression</h4>
 <p>Finally, I perform a probit regression</p>
-<div id="4a78d56f" class="cell" data-execution_count="11">
+<div id="4f59cccf" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -935,8 +935,8 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 Dep. Variable:                   gave   No. Observations:                50083
 Model:                         Probit   Df Residuals:                    50081
 Method:                           MLE   Df Model:                            1
-Date:                Fri, 02 May 2025   Pseudo R-squ.:               0.0009783
-Time:                        16:22:58   Log-Likelihood:                -5030.5
+Date:                Tue, 06 May 2025   Pseudo R-squ.:               0.0009783
+Time:                        18:55:27   Log-Likelihood:                -5030.5
 converged:                       True   LL-Null:                       -5035.4
 Covariance Type:            nonrobust   LLR p-value:                  0.001696
 ==============================================================================
@@ -958,7 +958,7 @@ treatment      0.0868      0.028      3.113      0.002       0.032       0.141
 <section id="t-test-for-21-and-11-match" class="level4">
 <h4 class="anchored" data-anchor-id="t-test-for-21-and-11-match">t-test for 2:1 and 1:1 match</h4>
 <p>Firstly, I assess the difference of donation rate between 2:1 match and 1:1 match</p>
-<div id="4481dde8" class="cell" data-execution_count="12">
+<div id="aca64996" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>data_2_1 <span class="op">=</span> data[data[<span class="st">"ratio"</span>].isin([<span class="dv">1</span>, <span class="dv">2</span>])].copy()</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>data_2_1[<span class="st">"ratio"</span>] <span class="op">=</span> pd.Categorical(data_2_1[<span class="st">"ratio"</span>].astype(<span class="bu">str</span>))</span>
@@ -986,7 +986,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <section id="t-test-for-31-and-11-match" class="level4">
 <h4 class="anchored" data-anchor-id="t-test-for-31-and-11-match">t-test for 3:1 and 1:1 match</h4>
 <p>Secondly, I assess the difference of donation rate between 3:1 match and 1:1 match</p>
-<div id="33d6a7ec" class="cell" data-execution_count="13">
+<div id="afd4327d" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>data_3_1 <span class="op">=</span> data[data[<span class="st">"ratio"</span>].isin([<span class="dv">1</span>, <span class="dv">3</span>])].copy()</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>data_3_1[<span class="st">"ratio"</span>] <span class="op">=</span> pd.Categorical(data_3_1[<span class="st">"ratio"</span>].astype(<span class="bu">str</span>))</span>
@@ -1014,7 +1014,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <section id="t-test-for-31-and-21-match" class="level4">
 <h4 class="anchored" data-anchor-id="t-test-for-31-and-21-match">t-test for 3:1 and 2:1 match</h4>
 <p>Finally, I assess the difference of donation rate between 3:1 match and 2:1 match</p>
-<div id="caf20759" class="cell" data-execution_count="14">
+<div id="4dc559d2" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>data_3_2 <span class="op">=</span> data[data[<span class="st">"ratio"</span>].isin([<span class="dv">2</span>, <span class="dv">3</span>])].copy()</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>data_3_2[<span class="st">"ratio"</span>] <span class="op">=</span> pd.Categorical(data_3_2[<span class="st">"ratio"</span>].astype(<span class="bu">str</span>))</span>
@@ -1043,7 +1043,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <section id="regression-analysis" class="level4">
 <h4 class="anchored" data-anchor-id="regression-analysis">Regression analysis</h4>
 <p>Alternatively, I assess the same issue using a regression method</p>
-<div id="180038b8" class="cell" data-execution_count="15">
+<div id="cf316cf9" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>data_1_2_3 <span class="op">=</span> data[data[<span class="st">"ratio"</span>].isin([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>])].copy()</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>data_1_2_3[<span class="st">"ratio"</span>] <span class="op">=</span> pd.Categorical(data_1_2_3[<span class="st">"ratio"</span>].astype(<span class="bu">str</span>))</span>
@@ -1072,7 +1072,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <section id="response-rate-difference" class="level4">
 <h4 class="anchored" data-anchor-id="response-rate-difference">Response rate difference</h4>
 <p>Here, we calculate the response rate difference between three match groups</p>
-<div id="6bb88f38" class="cell" data-execution_count="16">
+<div id="022a0b18" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>df_ratio <span class="op">=</span> data[data[<span class="st">"ratio"</span>].isin([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>])].copy()</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>rate_by_ratio <span class="op">=</span> df_ratio.groupby(<span class="st">"ratio"</span>, observed<span class="op">=</span><span class="va">True</span>)[<span class="st">"gave"</span>].mean()</span>
@@ -1099,7 +1099,7 @@ Response rate 3:1 - 2:1: 0.0001</code></pre>
 <p>In this subsection, I analyze the effect of the size of matched donation on the size of the charitable contribution.</p>
 <section id="pyrsm-t-test-for-amount-and-treatment-variable" class="level4">
 <h4 class="anchored" data-anchor-id="pyrsm-t-test-for-amount-and-treatment-variable">Pyrsm t-test for <code>amount</code> and <code>treatment</code> variable</h4>
-<div id="29c695c0" class="cell" data-execution_count="17">
+<div id="db8a918f" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>treat <span class="op">=</span> rsm.basics.compare_means({<span class="st">'data'</span>:data}, var1 <span class="op">=</span> <span class="st">'treat'</span>, var2 <span class="op">=</span> <span class="st">'amount'</span>, alt_hyp<span class="op">=</span><span class="st">"two-sided"</span>)</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>treat.summary()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -1124,7 +1124,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <section id="t-test-for-those-who-made-donations" class="level4">
 <h4 class="anchored" data-anchor-id="t-test-for-those-who-made-donations">t-test for those who made donations</h4>
 <p>Next, I analyze the effect of the size of matched donation on the size of the charitable contribution for those who make actual donation</p>
-<div id="c7be8f2d" class="cell" data-execution_count="18">
+<div id="a675d9a3" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>donation_group <span class="op">=</span> data[data[<span class="st">'gave'</span>] <span class="op">!=</span> <span class="dv">0</span>]</span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>treat_donate <span class="op">=</span> rsm.basics.compare_means({<span class="st">'donate_group'</span>:donation_group}, var1 <span class="op">=</span> <span class="st">'treat'</span>, var2 <span class="op">=</span> <span class="st">'amount'</span>, alt_hyp <span class="op">=</span> <span class="st">'two-sided'</span>)</span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>treat_donate.summary()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1148,7 +1148,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <p>The average donation in the control group was $45.54, compared to $43.87 in the treatment group — a difference of $1.67. However, this difference is not statistically significant (p = 0.559), as confirmed by the t-test.</p>
 <p>This suggests that while matching may increase the <strong>likelihood</strong> of giving, they do <strong>not appear to increase the donation amount</strong> among those who already decide to give. In other words, the treatment influences the <strong>extensive margin</strong> (whether to give), but not the <strong>intensive margin</strong> (how much to give).</p>
 <p>Furthermore, the treatment factor does <strong>not have a strong causal interpretation</strong>, because conditional-on-giving is a <strong>post-treatment selection</strong>. That is, once we restrict the sample to givers, we may violate random assignment — the treatment and control groups are no longer comparable within this restricted sample.</p>
-<div id="570389d6" class="cell" data-execution_count="19">
+<div id="6dcc0c0f" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>sns.<span class="bu">set</span>(style<span class="op">=</span><span class="st">"whitegrid"</span>)</span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>donated <span class="op">=</span> data[data[<span class="st">"gave"</span>] <span class="op">==</span> <span class="dv">1</span>].copy()</span>
@@ -1195,7 +1195,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <p>Further suppose that the true distribution of respondents who do get a charitable donation match of any size is Bernoulli with probability p=0.022 that a donation is made.</p>
 <section id="law-of-large-numbers" class="level3">
 <h3 class="anchored" data-anchor-id="law-of-large-numbers">Law of Large Numbers</h3>
-<div id="4130a18d" class="cell" data-execution_count="20">
+<div id="405a7b2d" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1237,7 +1237,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <section id="central-limit-theorem" class="level3">
 <h3 class="anchored" data-anchor-id="central-limit-theorem">Central Limit Theorem</h3>
 <p>Each of the four plots below shows the distribution of 1000 simulated differences in donation rates between treatment and control groups, at different sample sizes (50, 200, 500, 1000). As sample size increases, the distribution becomes narrower and more centered around the true difference of 0.004, illustrating the Central Limit Theorem in practice.</p>
-<div id="80c87d39" class="cell" data-execution_count="21">
+<div id="cc3edc1f" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>sns.<span class="bu">set</span>(style<span class="op">=</span><span class="st">"whitegrid"</span>)</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>p_control <span class="op">=</span> <span class="fl">0.018</span></span>
