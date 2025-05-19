@@ -1,0 +1,161 @@
+---
+title: "Multinomial Logit Model"
+author: "Yichen Wu"
+date: today
+jupyter: py3127
+format:
+  html:
+    code-fold:  False                
+execute:
+  echo: true
+  eval: true
+---
+
+This assignment expores two methods for estimating the MNL model: (1) via Maximum Likelihood, and (2) via a Bayesian approach using a Metropolis-Hastings MCMC algorithm.
+
+## 1. Likelihood for the Multi-nomial Logit (MNL) Model
+
+Suppose we have $i=1,\ldots,n$ consumers who each select exactly one product $j$ from a set of $J$ products. The outcome variable is the identity of the product chosen $y_i \in \{1, \ldots, J\}$ or equivalently a vector of $J-1$ zeros and $1$ one, where the $1$ indicates the selected product. For example, if the third product was chosen out of 3 products, then either $y=3$ or $y=(0,0,1)$ depending on how we want to represent it. Suppose also that we have a vector of data on each product $x_j$ (eg, brand, price, etc.).
+
+We model the consumer's decision as the selection of the product that provides the most utility, and we'll specify the utility function as a linear function of the product characteristics:
+
+$$ U_{ij} = x_j'\beta + \epsilon_{ij} $$
+
+where $\epsilon_{ij}$ is an i.i.d. extreme value error term.
+
+The choice of the i.i.d. extreme value error term leads to a closed-form expression for the probability that consumer $i$ chooses product $j$:
+
+$$ \mathbb{P}_i(j) = \frac{e^{x_j'\beta}}{\sum_{k=1}^Je^{x_k'\beta}} $$
+
+For example, if there are 3 products, the probability that consumer $i$ chooses product 3 is:
+
+$$ \mathbb{P}_i(3) = \frac{e^{x_3'\beta}}{e^{x_1'\beta} + e^{x_2'\beta} + e^{x_3'\beta}} $$
+
+A clever way to write the individual likelihood function for consumer $i$ is the product of the $J$ probabilities, each raised to the power of an indicator variable ($\delta_{ij}$) that indicates the chosen product:
+
+$$ L_i(\beta) = \prod_{j=1}^J \mathbb{P}_i(j)^{\delta_{ij}} = \mathbb{P}_i(1)^{\delta_{i1}} \times \ldots \times \mathbb{P}_i(J)^{\delta_{iJ}}$$
+
+Notice that if the consumer selected product $j=3$, then $\delta_{i3}=1$ while $\delta_{i1}=\delta_{i2}=0$ and the likelihood is:
+
+$$ L_i(\beta) = \mathbb{P}_i(1)^0 \times \mathbb{P}_i(2)^0 \times \mathbb{P}_i(3)^1 = \mathbb{P}_i(3) = \frac{e^{x_3'\beta}}{\sum_{k=1}^3e^{x_k'\beta}} $$
+
+The joint likelihood (across all consumers) is the product of the $n$ individual likelihoods:
+
+$$ L_n(\beta) = \prod_{i=1}^n L_i(\beta) = \prod_{i=1}^n \prod_{j=1}^J \mathbb{P}_i(j)^{\delta_{ij}} $$
+
+And the joint log-likelihood function is:
+
+$$ \ell_n(\beta) = \sum_{i=1}^n \sum_{j=1}^J \delta_{ij} \log(\mathbb{P}_i(j)) $$
+
+## 2. Simulate Conjoint Data
+
+We will simulate data from a conjoint experiment about video content streaming services. We elect to simulate 100 respondents, each completing 10 choice tasks, where they choose from three alternatives per task. For simplicity, there is not a "no choice" option; each simulated respondent must select one of the 3 alternatives.
+
+Each alternative is a hypothetical streaming offer consistent of three attributes: (1) brand is either Netflix, Amazon Prime, or Hulu; (2) ads can either be part of the experience, or it can be ad-free, and (3) price per month ranges from \$4 to \$32 in increments of \$4.
+
+The part-worths (ie, preference weights or beta parameters) for the attribute levels will be 1.0 for Netflix, 0.5 for Amazon Prime (with 0 for Hulu as the reference brand); -0.8 for included adverstisements (0 for ad-free); and -0.1\*price so that utility to consumer $i$ for hypothethical streaming service $j$ is
+
+$$
+u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times Price_j + \varepsilon_{ij}
+$$
+
+where the variables are binary indicators and $\varepsilon$ is Type 1 Extreme Value (ie, Gumble) distributed.
+
+## 3. Preparing the Data for Estimation
+
+The "hard part" of the MNL likelihood function is organizing the data, as we need to keep track of 3 dimensions (consumer $i$, covariate $k$, and product $j$) instead of the typical 2 dimensions for cross-sectional regression models (consumer $i$ and covariate $k$). The fact that each task for each respondent has the same number of alternatives (3) helps. In addition, we need to convert the categorical variables for brand and ads into binary variables.
+
+*todo: reshape and prep the data*
+
+```{python}
+import pandas as pd
+conjoint_data = pd.read_csv("conjoint_data.csv")
+
+X_cat = pd.get_dummies(conjoint_data[["brand", "ad"]], drop_first=True)
+
+X_cat["price"] = conjoint_data["price"]
+X_cat["choice"] = conjoint_data["choice"]
+
+X_cat["resp"] = conjoint_data["resp"]
+X_cat["task"] = conjoint_data["task"]
+
+group_sizes = X_cat.groupby(["resp", "task"]).size()
+valid_groups = group_sizes[group_sizes == 3].index
+
+X_prep = X_cat.set_index(["resp", "task"]).loc[valid_groups].reset_index()
+
+print(X_prep.head(10))
+```
+
+## 4. Estimation via Maximum Likelihood
+
+*todo: Code up the log-likelihood function.*
+
+*todo: Use `optim()` in R or `scipy.optimize()` in Python to find the MLEs for the 4 parameters (*$\beta_\text{netflix}$, $\beta_\text{prime}$, $\beta_\text{ads}$, $\beta_\text{price}$), as well as their standard errors (from the Hessian). For each parameter construct a 95% confidence interval.
+
+```{python}
+import pandas as pd
+import numpy as np
+from scipy.optimize import minimize
+
+cols = ["brand_N", "brand_P", "ad_Yes", "price"]
+X = X_prep[cols].values
+y = X_prep["choice"].values
+
+group_ids = X_prep[["resp", "task"]].astype(str).agg("_".join, axis=1)
+group_index = group_ids.groupby(group_ids).cumcount() == 0 
+group_bounds = np.where(group_index)[0].tolist() + [len(X)]
+
+def neg_log_likelihood(beta):
+    ll = 0
+    for i in range(len(group_bounds) - 1):
+        start = group_bounds[i]
+        end = group_bounds[i+1]
+        X_block = X[start:end]
+        y_block = y[start:end]
+        v = np.dot(X_block, beta)
+        v = np.atleast_1d(v).astype(float)
+        exp_v = np.exp(v)
+        prob = exp_v / exp_v.sum()
+        ll += np.log(prob[y_block == 1][0])  
+    return -ll  
+beta0 = np.zeros(X.shape[1])
+
+res = minimize(neg_log_likelihood, beta0, method='BFGS')
+
+beta_hat = res.x
+hess_inv = res.hess_inv
+se = np.sqrt(np.diag(hess_inv))
+ci_lower = beta_hat - 1.96 * se
+ci_upper = beta_hat + 1.96 * se
+
+results_df = pd.DataFrame({
+    "Parameter": cols,
+    "Estimate": beta_hat,
+    "Std. Error": se,
+    "95% CI Lower": ci_lower,
+    "95% CI Upper": ci_upper
+})
+
+print(results_df)
+```
+
+## 5. Estimation via Bayesian Methods
+
+*todo: code up a metropolis-hasting MCMC sampler of the posterior distribution. Take 11,000 steps and throw away the first 1,000, retaining the subsequent 10,000.*
+
+*hint: Use N(0,5) priors for the betas on the binary variables, and a N(0,1) prior for the price beta.*
+
+\_hint: instead of calculating post=lik\*prior, you can work in the log-space and calculate log-post = log-lik + log-prior (this should enable you to re-use your log-likelihood function from the MLE section just above)\_
+
+*hint: King Markov (in the video) use a candidate distribution of a coin flip to decide whether to move left or right among his islands. Unlike King Markov, we have 4 dimensions (because we have 4 betas) and our dimensions are continuous. So, use a multivariate normal distribution to pospose the next location for the algorithm to move to. I recommend a MNV(mu, Sigma) where mu=c(0,0,0,0) and sigma has diagonal values c(0.05, 0.05, 0.05, 0.005) and zeros on the off-diagonal. Since this MVN has no covariances, you can sample each dimension independently (so 4 univariate normals instead of 1 multivariate normal), where the first 3 univariate normals are N(0,0.05) and the last one if N(0,0.005).*
+
+*todo: for at least one of the 4 parameters, show the trace plot of the algorithm, as well as the histogram of the posterior distribution.*
+
+*todo: report the 4 posterior means, standard deviations, and 95% credible intervals and compare them to your results from the Maximum Likelihood approach.*
+
+## 6. Discussion
+
+*todo: Suppose you did not simulate the data. What do you observe about the parameter estimates? What does* $\beta_\text{Netflix} > \beta_\text{Prime}$ mean? Does it make sense that $\beta_\text{price}$ is negative?
+
+*todo: At a high level, discuss what change you would need to make in order to simulate data from --- and estimate the parameters of --- a multi-level (aka random-parameter or hierarchical) model. This is the model we use to analyze "real world" conjoint data.*

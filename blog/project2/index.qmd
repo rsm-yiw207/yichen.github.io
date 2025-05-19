@@ -334,17 +334,20 @@ df.head()
 ```
 
 #### Check summary statistics of the dataset
+
 ```{python}
 print(df.describe().round(2))
 print(df.info())
 ```
 
 #### Distribution plot of the dataset
+
 ```{python}
 fig = rsm.distr_plot(data=df)
 ```
 
 #### Build models and check coefficients
+
 ```{python}
 df = df.drop(columns=["Unnamed: 0", "id"])
 
@@ -379,11 +382,12 @@ The Poisson regression model reveals several significant relationships between l
 
 Cleanliness ratings play a strong role as well: for every one-point increase in review_scores_cleanliness, the expected number of reviews rises by 12%, underscoring how perceived cleanliness boosts customer trust and demand. Listings with more bedrooms also see more reviews, with each additional bedroom linked to an 8% increase. In contrast, more bathrooms are surprisingly associated with fewer reviews, which could reflect specific property types or customer expectations.
 
-Price has a modest negative relationship with reviews: for every $100 increase in nightly rate, the number of reviews is expected to decline by about 4%, consistent with the idea that higher prices may limit the booking volume. Interestingly, review_scores_location and review_scores_value both show negative associations with review count, suggesting that highly rated properties in these areas may rely less on volume and more on perceived quality or exclusivity.
+Price has a modest negative relationship with reviews: for every \$100 increase in nightly rate, the number of reviews is expected to decline by about 4%, consistent with the idea that higher prices may limit the booking volume. Interestingly, review_scores_location and review_scores_value both show negative associations with review count, suggesting that highly rated properties in these areas may rely less on volume and more on perceived quality or exclusivity.
 
 Overall, the results suggest that ease of booking, host tenure, cleanliness, and property configuration are key drivers of booking volume, while price sensitivity and certain customer ratings reflect more nuanced dynamics.
 
 #### Check multicollinearity
+
 ```{python}
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from patsy import dmatrices
