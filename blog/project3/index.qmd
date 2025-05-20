@@ -1,7 +1,7 @@
 ---
 title: "Multinomial Logit Model"
 author: "Yichen Wu"
-date: 20-05-2025
+date: 05-20-2025
 callout-appearance: minimal # this hides the blue "i" icon on .callout-notes
 jupyter: py3127
 format:
@@ -203,28 +203,28 @@ posterior_samples = posterior_samples[burn_in:]
 
 *todo: for at least one of the 4 parameters, show the trace plot of the algorithm, as well as the histogram of the posterior distribution.*
 
+### Trace Plot
 ```{python}
 import matplotlib.pyplot as plt
 
-plt.figure(figsize=(12, 5))
-
-# Trace plot for price
-plt.subplot(1, 2, 1)
+plt.figure(figsize=(5, 2))
 plt.plot(posterior_samples[:, 3], color='blue', alpha=0.7)
 plt.title("Trace Plot for price")
 plt.xlabel("Iteration")
 plt.ylabel("Value")
+plt.tight_layout()
+plt.show()
+```
 
-# Histogram of posterior for price
-plt.subplot(1, 2, 2)
+### Histogram
+```{python}
+plt.figure(figsize=(5, 2))
 plt.hist(posterior_samples[:, 3], bins=40, color='skyblue', edgecolor='black', density=True)
 plt.title("Posterior Distribution of price")
 plt.xlabel("Value")
 plt.ylabel("Density")
-
 plt.tight_layout()
 plt.show()
-
 ```
 
 *todo: report the 4 posterior means, standard deviations, and 95% credible intervals and compare them to your results from the Maximum Likelihood approach.*

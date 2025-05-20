@@ -5,9 +5,9 @@
       "metadata": {},
       "source": [
         "---\n",
-        "title: \"Poisson Regression Examples\"\n",
+        "title: \"Multinomial Logit Model\"\n",
         "author: \"Yichen Wu\"\n",
-        "date: 05-03-2025\n",
+        "date: 05-20-2025\n",
         "callout-appearance: minimal # this hides the blue \"i\" icon on .callout-notes\n",
         "jupyter: py3127\n",
         "format:\n",
@@ -74,7 +74,7 @@
         "\n",
         "*todo: reshape and prep the data*"
       ],
-      "id": "e58147c3"
+      "id": "456e39e8"
     },
     {
       "cell_type": "code",
@@ -98,7 +98,7 @@
         "\n",
         "print(X_prep.head(10))"
       ],
-      "id": "349d0df7",
+      "id": "3107944e",
       "execution_count": null,
       "outputs": []
     },
@@ -112,7 +112,7 @@
         "\n",
         "*todo: Use `optim()` in R or `scipy.optimize()` in Python to find the MLEs for the 4 parameters (*$\\beta_\\text{netflix}$, $\\beta_\\text{prime}$, $\\beta_\\text{ads}$, $\\beta_\\text{price}$), as well as their standard errors (from the Hessian). For each parameter construct a 95% confidence interval."
       ],
-      "id": "58a8ef43"
+      "id": "a998456c"
     },
     {
       "cell_type": "code",
@@ -163,7 +163,7 @@
         "\n",
         "print(results_df)"
       ],
-      "id": "e844f1fc",
+      "id": "259b425e",
       "execution_count": null,
       "outputs": []
     },
@@ -181,7 +181,7 @@
         "\n",
         "*hint: King Markov (in the video) use a candidate distribution of a coin flip to decide whether to move left or right among his islands. Unlike King Markov, we have 4 dimensions (because we have 4 betas) and our dimensions are continuous. So, use a multivariate normal distribution to pospose the next location for the algorithm to move to. I recommend a MNV(mu, Sigma) where mu=c(0,0,0,0) and sigma has diagonal values c(0.05, 0.05, 0.05, 0.005) and zeros on the off-diagonal. Since this MVN has no covariances, you can sample each dimension independently (so 4 univariate normals instead of 1 multivariate normal), where the first 3 univariate normals are N(0,0.05) and the last one if N(0,0.005).*"
       ],
-      "id": "183da994"
+      "id": "a5aec77a"
     },
     {
       "cell_type": "code",
@@ -234,7 +234,7 @@
         "# 7. 丢弃 burn-in 样本，保留 10,000 后验样本\n",
         "posterior_samples = posterior_samples[burn_in:]"
       ],
-      "id": "0fc2d99b",
+      "id": "395a6628",
       "execution_count": null,
       "outputs": []
     },
@@ -242,9 +242,11 @@
       "cell_type": "markdown",
       "metadata": {},
       "source": [
-        "*todo: for at least one of the 4 parameters, show the trace plot of the algorithm, as well as the histogram of the posterior distribution.*"
+        "*todo: for at least one of the 4 parameters, show the trace plot of the algorithm, as well as the histogram of the posterior distribution.*\n",
+        "\n",
+        "### Trace Plot"
       ],
-      "id": "5070702e"
+      "id": "aee66af6"
     },
     {
       "cell_type": "code",
@@ -252,26 +254,39 @@
       "source": [
         "import matplotlib.pyplot as plt\n",
         "\n",
-        "plt.figure(figsize=(12, 5))\n",
-        "\n",
-        "# Trace plot for price\n",
-        "plt.subplot(1, 2, 1)\n",
+        "plt.figure(figsize=(5, 2))\n",
         "plt.plot(posterior_samples[:, 3], color='blue', alpha=0.7)\n",
         "plt.title(\"Trace Plot for price\")\n",
         "plt.xlabel(\"Iteration\")\n",
         "plt.ylabel(\"Value\")\n",
-        "\n",
-        "# Histogram of posterior for price\n",
-        "plt.subplot(1, 2, 2)\n",
+        "plt.tight_layout()\n",
+        "plt.show()"
+      ],
+      "id": "8d951a01",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### Histogram"
+      ],
+      "id": "19574d15"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "plt.figure(figsize=(5, 2))\n",
         "plt.hist(posterior_samples[:, 3], bins=40, color='skyblue', edgecolor='black', density=True)\n",
         "plt.title(\"Posterior Distribution of price\")\n",
         "plt.xlabel(\"Value\")\n",
         "plt.ylabel(\"Density\")\n",
-        "\n",
         "plt.tight_layout()\n",
         "plt.show()"
       ],
-      "id": "90feeca3",
+      "id": "0836ee30",
       "execution_count": null,
       "outputs": []
     },
@@ -281,7 +296,7 @@
       "source": [
         "*todo: report the 4 posterior means, standard deviations, and 95% credible intervals and compare them to your results from the Maximum Likelihood approach.*"
       ],
-      "id": "1185fbfa"
+      "id": "22b09f63"
     },
     {
       "cell_type": "code",
@@ -305,7 +320,7 @@
         "comparison_df = pd.merge(results_df, posterior_df, on=\"Parameter\")\n",
         "print(comparison_df)"
       ],
-      "id": "a83a4a4e",
+      "id": "c7db1242",
       "execution_count": null,
       "outputs": []
     },
@@ -334,7 +349,7 @@
         "\n",
         "To simulate such data, we would first draw a \\beta_i for each respondent from the population distribution, then simulate choices based on those respondent-specific coefficients. For estimation, we would shift from maximum likelihood to Bayesian methods such as Hierarchical Bayes (HB) or use frequentist approaches like Mixed Logit via simulated maximum likelihood. These methods allow us to estimate both the population-level parameters (\\mu, \\Sigma) and the individual-level betas, making the model better suited for analyzing real-world conjoint data where heterogeneity in consumer preferences is expected and important to capture."
       ],
-      "id": "14bd7db0"
+      "id": "f0caf4bc"
     }
   ],
   "metadata": {
