@@ -183,12 +183,20 @@ window.Quarto = {
   <ul>
   <li><a href="#likelihood-for-the-multi-nomial-logit-mnl-model" id="toc-likelihood-for-the-multi-nomial-logit-mnl-model" class="nav-link active" data-scroll-target="#likelihood-for-the-multi-nomial-logit-mnl-model">1. Likelihood for the Multi-nomial Logit (MNL) Model</a></li>
   <li><a href="#simulate-conjoint-data" id="toc-simulate-conjoint-data" class="nav-link" data-scroll-target="#simulate-conjoint-data">2. Simulate Conjoint Data</a></li>
-  <li><a href="#preparing-the-data-for-estimation" id="toc-preparing-the-data-for-estimation" class="nav-link" data-scroll-target="#preparing-the-data-for-estimation">3. Preparing the Data for Estimation</a></li>
-  <li><a href="#estimation-via-maximum-likelihood" id="toc-estimation-via-maximum-likelihood" class="nav-link" data-scroll-target="#estimation-via-maximum-likelihood">4. Estimation via Maximum Likelihood</a></li>
+  <li><a href="#preparing-the-data-for-estimation" id="toc-preparing-the-data-for-estimation" class="nav-link" data-scroll-target="#preparing-the-data-for-estimation">3. Preparing the Data for Estimation</a>
+  <ul class="collapse">
+  <li><a href="#reshape-and-prepare-the-data" id="toc-reshape-and-prepare-the-data" class="nav-link" data-scroll-target="#reshape-and-prepare-the-data">Reshape and prepare the data</a></li>
+  </ul></li>
+  <li><a href="#estimation-via-maximum-likelihood" id="toc-estimation-via-maximum-likelihood" class="nav-link" data-scroll-target="#estimation-via-maximum-likelihood">4. Estimation via Maximum Likelihood</a>
+  <ul class="collapse">
+  <li><a href="#log-likelood-function-and-optimize-with-scipy.optimize" id="toc-log-likelood-function-and-optimize-with-scipy.optimize" class="nav-link" data-scroll-target="#log-likelood-function-and-optimize-with-scipy.optimize">Log-likelood function and optimize with scipy.optimize()</a></li>
+  </ul></li>
   <li><a href="#estimation-via-bayesian-methods" id="toc-estimation-via-bayesian-methods" class="nav-link" data-scroll-target="#estimation-via-bayesian-methods">5. Estimation via Bayesian Methods</a>
   <ul class="collapse">
+  <li><a href="#metropolis-hasting-mcmc-sampler" id="toc-metropolis-hasting-mcmc-sampler" class="nav-link" data-scroll-target="#metropolis-hasting-mcmc-sampler">Metropolis-hasting MCMC sampler</a></li>
   <li><a href="#trace-plot" id="toc-trace-plot" class="nav-link" data-scroll-target="#trace-plot">Trace Plot</a></li>
   <li><a href="#histogram" id="toc-histogram" class="nav-link" data-scroll-target="#histogram">Histogram</a></li>
+  <li><a href="#final-results" id="toc-final-results" class="nav-link" data-scroll-target="#final-results">Final Results</a></li>
   </ul></li>
   <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">6. Discussion</a></li>
   </ul>
@@ -261,8 +269,9 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 <section id="preparing-the-data-for-estimation" class="level2">
 <h2 class="anchored" data-anchor-id="preparing-the-data-for-estimation">3. Preparing the Data for Estimation</h2>
 <p>The “hard part” of the MNL likelihood function is organizing the data, as we need to keep track of 3 dimensions (consumer <span class="math inline">\(i\)</span>, covariate <span class="math inline">\(k\)</span>, and product <span class="math inline">\(j\)</span>) instead of the typical 2 dimensions for cross-sectional regression models (consumer <span class="math inline">\(i\)</span> and covariate <span class="math inline">\(k\)</span>). The fact that each task for each respondent has the same number of alternatives (3) helps. In addition, we need to convert the categorical variables for brand and ads into binary variables.</p>
-<p><em>todo: reshape and prep the data</em></p>
-<div id="9daf4861" class="cell" data-execution_count="1">
+<section id="reshape-and-prepare-the-data" class="level3">
+<h3 class="anchored" data-anchor-id="reshape-and-prepare-the-data">Reshape and prepare the data</h3>
+<div id="e2717487" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>conjoint_data <span class="op">=</span> pd.read_csv(<span class="st">"conjoint_data.csv"</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -295,11 +304,12 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 </div>
 </div>
 </section>
+</section>
 <section id="estimation-via-maximum-likelihood" class="level2">
 <h2 class="anchored" data-anchor-id="estimation-via-maximum-likelihood">4. Estimation via Maximum Likelihood</h2>
-<p><em>todo: Code up the log-likelihood function.</em></p>
-<p><em>todo: Use <code>optim()</code> in R or <code>scipy.optimize()</code> in Python to find the MLEs for the 4 parameters (</em><span class="math inline">\(\beta_\text{netflix}\)</span>, <span class="math inline">\(\beta_\text{prime}\)</span>, <span class="math inline">\(\beta_\text{ads}\)</span>, <span class="math inline">\(\beta_\text{price}\)</span>), as well as their standard errors (from the Hessian). For each parameter construct a 95% confidence interval.</p>
-<div id="d1812fc4" class="cell" data-execution_count="2">
+<section id="log-likelood-function-and-optimize-with-scipy.optimize" class="level3">
+<h3 class="anchored" data-anchor-id="log-likelood-function-and-optimize-with-scipy.optimize">Log-likelood function and optimize with scipy.optimize()</h3>
+<div id="2ed3132c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize</span>
@@ -353,13 +363,12 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 </div>
 </div>
 </section>
+</section>
 <section id="estimation-via-bayesian-methods" class="level2">
 <h2 class="anchored" data-anchor-id="estimation-via-bayesian-methods">5. Estimation via Bayesian Methods</h2>
-<p><em>todo: code up a metropolis-hasting MCMC sampler of the posterior distribution. Take 11,000 steps and throw away the first 1,000, retaining the subsequent 10,000.</em></p>
-<p><em>hint: Use N(0,5) priors for the betas on the binary variables, and a N(0,1) prior for the price beta.</em></p>
-<p>_hint: instead of calculating post=lik*prior, you can work in the log-space and calculate log-post = log-lik + log-prior (this should enable you to re-use your log-likelihood function from the MLE section just above)_</p>
-<p><em>hint: King Markov (in the video) use a candidate distribution of a coin flip to decide whether to move left or right among his islands. Unlike King Markov, we have 4 dimensions (because we have 4 betas) and our dimensions are continuous. So, use a multivariate normal distribution to pospose the next location for the algorithm to move to. I recommend a MNV(mu, Sigma) where mu=c(0,0,0,0) and sigma has diagonal values c(0.05, 0.05, 0.05, 0.005) and zeros on the off-diagonal. Since this MVN has no covariances, you can sample each dimension independently (so 4 univariate normals instead of 1 multivariate normal), where the first 3 univariate normals are N(0,0.05) and the last one if N(0,0.005).</em></p>
-<div id="6e6b3987" class="cell" data-execution_count="3">
+<section id="metropolis-hasting-mcmc-sampler" class="level3">
+<h3 class="anchored" data-anchor-id="metropolis-hasting-mcmc-sampler">Metropolis-hasting MCMC sampler</h3>
+<div id="e9dc0f82" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_likelihood(beta):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    ll <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(group_bounds) <span class="op">-</span> <span class="dv">1</span>):</span>
@@ -369,30 +378,30 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        y_block <span class="op">=</span> y[start:end]</span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        v <span class="op">=</span> np.dot(X_block, beta)</span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        v <span class="op">=</span> np.atleast_1d(v).astype(<span class="bu">float</span>)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        exp_v <span class="op">=</span> np.exp(v <span class="op">-</span> np.<span class="bu">max</span>(v))  <span class="co"># 数值稳定性</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        exp_v <span class="op">=</span> np.exp(v <span class="op">-</span> np.<span class="bu">max</span>(v)) </span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        prob <span class="op">=</span> exp_v <span class="op">/</span> exp_v.<span class="bu">sum</span>()</span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> np.<span class="bu">any</span>(y_block <span class="op">==</span> <span class="dv">1</span>):</span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>            ll <span class="op">+=</span> np.log(prob[y_block <span class="op">==</span> <span class="dv">1</span>][<span class="dv">0</span>])</span>
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ll</span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. log-prior 函数</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co"># log-prior function</span></span>
 <span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_prior(beta):</span>
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> ((beta[<span class="dv">0</span>:<span class="dv">3</span>]<span class="op">**</span><span class="dv">2</span>).<span class="bu">sum</span>() <span class="op">/</span> <span class="dv">5</span> <span class="op">+</span> beta[<span class="dv">3</span>]<span class="op">**</span><span class="dv">2</span>)</span>
 <span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_posterior(beta):</span>
 <span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> log_likelihood(beta) <span class="op">+</span> log_prior(beta)</span>
 <span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. MCMC 参数</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="co"># MCMC parameter</span></span>
 <span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>n_steps <span class="op">=</span> <span class="dv">11000</span></span>
 <span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>burn_in <span class="op">=</span> <span class="dv">1000</span></span>
 <span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>posterior_samples <span class="op">=</span> np.zeros((n_steps, <span class="dv">4</span>))</span>
 <span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>current_beta <span class="op">=</span> np.zeros(<span class="dv">4</span>)</span>
 <span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>current_log_post <span class="op">=</span> log_posterior(current_beta)</span>
 <span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. proposal 分布（独立正态噪声）</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Proposal distribution</span></span>
 <span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>proposal_sd <span class="op">=</span> np.array([np.sqrt(<span class="fl">0.05</span>), np.sqrt(<span class="fl">0.05</span>), np.sqrt(<span class="fl">0.05</span>), np.sqrt(<span class="fl">0.005</span>)])</span>
 <span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. MCMC 主循环</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="co"># MCMC main iteration</span></span>
 <span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> step <span class="kw">in</span> <span class="bu">range</span>(n_steps):</span>
 <span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    proposal <span class="op">=</span> current_beta <span class="op">+</span> np.random.normal(<span class="dv">0</span>, proposal_sd)</span>
 <span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    proposal_log_post <span class="op">=</span> log_posterior(proposal)</span>
@@ -404,13 +413,12 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 <span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>    posterior_samples[step] <span class="op">=</span> current_beta</span>
 <span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a><span class="co"># 7. 丢弃 burn-in 样本，保留 10,000 后验样本</span></span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>posterior_samples <span class="op">=</span> posterior_samples[burn_in:]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>posterior_samples <span class="op">=</span> posterior_samples[burn_in:]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p><em>todo: for at least one of the 4 parameters, show the trace plot of the algorithm, as well as the histogram of the posterior distribution.</em></p>
+</section>
 <section id="trace-plot" class="level3">
 <h3 class="anchored" data-anchor-id="trace-plot">Trace Plot</h3>
-<div id="6baea58c" class="cell" data-execution_count="4">
+<div id="87157516" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">2</span>))</span>
@@ -431,7 +439,7 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 </section>
 <section id="histogram" class="level3">
 <h3 class="anchored" data-anchor-id="histogram">Histogram</h3>
-<div id="9a4c74b5" class="cell" data-execution_count="5">
+<div id="76d3d3dd" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">2</span>))</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>plt.hist(posterior_samples[:, <span class="dv">3</span>], bins<span class="op">=</span><span class="dv">40</span>, color<span class="op">=</span><span class="st">'skyblue'</span>, edgecolor<span class="op">=</span><span class="st">'black'</span>, density<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Posterior Distribution of price"</span>)</span>
@@ -447,8 +455,10 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 </div>
 </div>
 </div>
-<p><em>todo: report the 4 posterior means, standard deviations, and 95% credible intervals and compare them to your results from the Maximum Likelihood approach.</em></p>
-<div id="b2f6c4b2" class="cell" data-execution_count="6">
+</section>
+<section id="final-results" class="level3">
+<h3 class="anchored" data-anchor-id="final-results">Final Results</h3>
+<div id="437602a4" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>param_names <span class="op">=</span> results_df[<span class="st">"Parameter"</span>].tolist()</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>posterior_means <span class="op">=</span> posterior_samples.mean(axis<span class="op">=</span><span class="dv">0</span>)</span>
@@ -468,16 +478,16 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 <span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(comparison_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Parameter  Estimate  Std. Error  95% CI Lower  95% CI Upper  Posterior Mean  \
-0   brand_N  0.941195    0.018667      0.904608      0.977782        0.954101   
-1   brand_P  0.501615    0.040084      0.423050      0.580181        0.506631   
-2    ad_Yes -0.731994    0.022530     -0.776154     -0.687835       -0.727228   
-3     price -0.099480    0.012599     -0.124174     -0.074787       -0.100072   
+0   brand_N  0.941195    0.018667      0.904608      0.977782        0.940129   
+1   brand_P  0.501615    0.040084      0.423050      0.580181        0.490564   
+2    ad_Yes -0.731994    0.022530     -0.776154     -0.687835       -0.737377   
+3     price -0.099480    0.012599     -0.124174     -0.074787       -0.100280   
 
    Posterior Std  Posterior 2.5%  Posterior 97.5%  
-0       0.119646        0.709895         1.193076  
-1       0.119987        0.268066         0.719183  
-2       0.085019       -0.906384        -0.554913  
-3       0.006801       -0.113921        -0.087068  </code></pre>
+0       0.107483        0.743924         1.157712  
+1       0.103284        0.299728         0.683679  
+2       0.082113       -0.885301        -0.585643  
+3       0.006252       -0.112785        -0.087323  </code></pre>
 </div>
 </div>
 <p>The Maximum Likelihood Estimation (MLE) and Bayesian Metropolis-Hastings MCMC approaches produced broadly consistent results across all four parameters in the model: brand_N, brand_P, ad_Yes, and price. The point estimates from MLE and the posterior means from MCMC were nearly identical, with differences generally within 0.01–0.02, indicating strong agreement in central tendency. However, the MCMC approach provides a fuller picture of uncertainty. While MLE standard errors and confidence intervals rely on approximations using the curvature of the likelihood (via the Hessian), the MCMC-derived posterior standard deviations and 95% credible intervals are based on the actual sampled distribution of parameter values. This is particularly valuable for interpreting parameters like price, where the credible interval can be directly interpreted as the probability that the parameter lies within a specific range, something the frequentist confidence interval cannot offer. Overall, the MCMC method supports and complements the MLE results while offering a more intuitive and informative description of parameter uncertainty.</p>
@@ -485,11 +495,9 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 </section>
 <section id="discussion" class="level2">
 <h2 class="anchored" data-anchor-id="discussion">6. Discussion</h2>
-<p><em>todo: Suppose you did not simulate the data. What do you observe about the parameter estimates? What does</em> <span class="math inline">\(\beta_\text{Netflix} &gt; \beta_\text{Prime}\)</span> mean? Does it make sense that <span class="math inline">\(\beta_\text{price}\)</span> is negative?</p>
-<p>If we didn’t know that the data were simulated, we could still draw meaningful conclusions from the model estimates. First, the fact that <em> &gt; </em> suggests that, holding advertising and price constant, users tend to prefer Netflix over Prime. This can be interpreted as Netflix having a stronger brand effect, or users perceiving more value in Netflix’s offerings.</p>
+<p>If we didn’t know that the data were simulated, we could still draw meaningful conclusions from the model estimates. First, the fact that &gt; suggests that, holding advertising and price constant, users tend to prefer Netflix over Prime. This can be interpreted as Netflix having a stronger brand effect, or users perceiving more value in Netflix’s offerings.</p>
 <p>Additionally, the estimate for _ is negative, which indicates that as the price increases, the utility of a product decreases. This aligns perfectly with economic intuition—higher prices make an option less likely to be chosen. The model successfully captures price sensitivity, adding to its explanatory power and credibility.</p>
 <p>Overall, even without knowing the data were simulated, the estimated parameters have clear behavioral interpretations. This suggests that the multinomial logit (MNL) model is appropriate for the data, and that the parameter estimates are stable and interpretable. It also highlights the effectiveness of discrete choice models in capturing user preferences.</p>
-<p><em>todo: At a high level, discuss what change you would need to make in order to simulate data from — and estimate the parameters of — a multi-level (aka random-parameter or hierarchical) model. This is the model we use to analyze “real world” conjoint data.</em></p>
 <p>To simulate data from — and estimate parameters of — a multi-level (also known as random-parameter or hierarchical) model, we would need to modify both the data-generating process and the estimation approach to account for individual-level heterogeneity. Instead of assuming a single shared set of parameters for all respondents (as in the standard MNL), we would assume that each respondent i has their own _i, drawn from a higher-level population distribution, such as _i (, ). This allows for variation in preferences across individuals.</p>
 <p>To simulate such data, we would first draw a _i for each respondent from the population distribution, then simulate choices based on those respondent-specific coefficients. For estimation, we would shift from maximum likelihood to Bayesian methods such as Hierarchical Bayes (HB) or use frequentist approaches like Mixed Logit via simulated maximum likelihood. These methods allow us to estimate both the population-level parameters (, ) and the individual-level betas, making the model better suited for analyzing real-world conjoint data where heterogeneity in consumer preferences is expected and important to capture.</p>
 
