@@ -1,7 +1,8 @@
 ---
 title: "Multinomial Logit Model"
 author: "Yichen Wu"
-date: 20-03-2025
+date: 20-05-2025
+callout-appearance: minimal # this hides the blue "i" icon on .callout-notes
 jupyter: py3127
 format:
   html:
