@@ -1,0 +1,624 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: \"Poisson Regression Examples\"\n",
+        "author: \"Yichen Wu\"\n",
+        "date: 05-03-2025\n",
+        "callout-appearance: minimal # this hides the blue \"i\" icon on .callout-notes\n",
+        "jupyter: py3127\n",
+        "format:\n",
+        "  html:\n",
+        "    code-fold:  False                \n",
+        "execute:\n",
+        "  echo: true\n",
+        "  eval: true\n",
+        "---\n",
+        "\n",
+        "## Blueprinty Case Study\n",
+        "\n",
+        "### Introduction\n",
+        "\n",
+        "Blueprinty is a small firm that makes software for developing blueprints specifically for submitting patent applications to the US patent office. Their marketing team would like to make the claim that patent applicants using Blueprinty's software are more successful in getting their patent applications approved. Ideal data to study such an effect might include the success rate of patent applications before using Blueprinty's software and after using it. Unfortunately, such data is not available.\n",
+        "\n",
+        "However, Blueprinty has collected data on 1,500 mature (non-startup) engineering firms. The data include each firm's number of patents awarded over the last 5 years, regional location, age since incorporation, and whether or not the firm uses Blueprinty's software. The marketing team would like to use this data to make the claim that firms using Blueprinty's software are more successful in getting their patent applications approved.\n",
+        "\n",
+        "### Data"
+      ],
+      "id": "44e6c56e"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import pandas as pd\n",
+        "import pyrsm as rsm\n",
+        "blueprinty = pd.read_csv('blueprinty.csv')\n",
+        "\n",
+        "blueprinty.head(5)"
+      ],
+      "id": "e351c348",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "#### Histograms of patents"
+      ],
+      "id": "4e6f9b91"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import matplotlib.pyplot as plt\n",
+        "import seaborn as sns\n",
+        "\n",
+        "mean_patents = blueprinty.groupby(\"iscustomer\")[\"patents\"].mean().reset_index()\n",
+        "mean_patents[\"Group\"] = mean_patents[\"iscustomer\"].map({0: \"Non-Customer\", 1: \"Customer\"})\n",
+        "\n",
+        "sns.set(style=\"whitegrid\")\n",
+        "plt.figure(figsize=(6, 4))\n",
+        "sns.barplot(data=mean_patents, x=\"Group\", y=\"patents\", palette=\"pastel\")\n",
+        "\n",
+        "plt.ylabel(\"Average Number of Patents\")\n",
+        "plt.title(\"Average Patents by Customer Status\")\n",
+        "plt.ylim(0, mean_patents[\"patents\"].max() * 1.2)\n",
+        "plt.tight_layout()\n",
+        "plt.show()"
+      ],
+      "id": "51c5b440",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "The bar chart compares the average number of patents between customers and non-customers. We observe that customers of blueprinty have a higher average number of patents.\n",
+        "\n",
+        "Blueprinty customers are not selected at random. It may be important to account for systematic differences in the age and regional location of customers vs non-customers.\n",
+        "\n",
+        "#### Comparison of regions by customer status"
+      ],
+      "id": "9f6d9f80"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "region_counts = blueprinty.groupby([\"region\", \"iscustomer\"]).size().reset_index(name=\"count\")\n",
+        "\n",
+        "region_counts[\"Customer Status\"] = region_counts[\"iscustomer\"].map({0: \"Non-Customer\", 1: \"Customer\"})\n",
+        "\n",
+        "plt.figure(figsize=(10, 5))\n",
+        "sns.barplot(data=region_counts, x=\"region\", y=\"count\", hue=\"Customer Status\", palette=\"pastel\")\n",
+        "plt.title(\"Number of Firms by Region and Customer Status\")\n",
+        "plt.xlabel(\"Region\")\n",
+        "plt.ylabel(\"Count\")\n",
+        "plt.legend(title=\"Customer Status\")\n",
+        "plt.xticks(rotation=45)\n",
+        "plt.tight_layout()\n",
+        "plt.show()"
+      ],
+      "id": "878d7931",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "The distribution of firms by region and customer status reveals a clear pattern: customer firms are highly concentrated in the Northeast, whereas other regions such as the Midwest, South, and Southwest are dominated by non-customer firms. This suggests that customers may be geographically concentrated, possibly reflecting regional hubs for innovation or stronger commercial ties in the Northeast.\n",
+        "\n",
+        "#### Comparison of ages by customer status"
+      ],
+      "id": "15848b59"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "mean_ages = blueprinty.groupby(\"iscustomer\")[\"age\"].mean().reset_index()\n",
+        "mean_ages[\"Customer Status\"] = mean_ages[\"iscustomer\"].map({0: \"Non-Customer\", 1: \"Customer\"})\n",
+        "\n",
+        "plt.figure(figsize=(6, 4))\n",
+        "sns.barplot(data=mean_ages, x=\"Customer Status\", y=\"age\", palette=\"pastel\")\n",
+        "plt.ylabel(\"Average Age\")\n",
+        "plt.title(\"Average Age by Customer Status\")\n",
+        "plt.tight_layout()\n",
+        "plt.show()"
+      ],
+      "id": "8ccb15c2",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "The chart illustrates that customer firms are, on average, slightly older than non-customer firms. While the difference is modest, it suggests that firms who become customers may tend to be more established or mature.\n",
+        "\n",
+        "### Estimation of Simple Poisson Model\n",
+        "\n",
+        "Since our outcome variable of interest can only be small integer values per a set unit of time, we can use a Poisson density to model the number of patents awarded to each engineering firm over the last 5 years. We start by estimating a simple Poisson model via Maximum Likelihood.\n",
+        "\n",
+        "#### likelihood for\\* $Y \\sim \\text{Poisson}(\\lambda)$. Note that $f(Y|\\lambda) = e^{-\\lambda}\\lambda^Y/Y!$.\n",
+        "\n",
+        "Assume we observe data $Y_1, Y_2, ..., Y_n$ independently from a Poisson distribution:\n",
+        "\n",
+        "$$\n",
+        "P(Y_i = y_i) = \\frac{e^{-\\lambda} \\lambda^{y_i}}{y_i!}\n",
+        "$$\n",
+        "\n",
+        "The likelihood function is:\n",
+        "\n",
+        "$$\n",
+        "\\mathcal{L}(\\lambda) = \\prod_{i=1}^{n} \\frac{e^{-\\lambda} \\lambda^{y_i}}{y_i!}\n",
+        "$$\n",
+        "\n",
+        "#### This is a function of lambda and Y"
+      ],
+      "id": "715b0d63"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import numpy as np\n",
+        "from scipy.optimize import minimize\n",
+        "from scipy.special import gammaln \n",
+        "def log_likelihood_poisson(lmbda, y):\n",
+        "    if lmbda <= 0:\n",
+        "        return -np.inf\n",
+        "    n = len(y)\n",
+        "    return -n * lmbda + np.sum(y) * np.log(lmbda) - np.sum(gammaln(y + 1))"
+      ],
+      "id": "8d3f563f",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "#### Plot of lambda and likelihood *(use the observed number of patents as the input for Y)*"
+      ],
+      "id": "992f3dee"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "Y = blueprinty[\"patents\"].dropna().values\n",
+        "lambdas = np.linspace(0.01, 10, 300)\n",
+        "logliks = [log_likelihood_poisson(lmbda, Y) for lmbda in lambdas]\n",
+        "\n",
+        "plt.figure(figsize=(8, 4))\n",
+        "plt.plot(lambdas, logliks, color=\"blue\")\n",
+        "plt.axvline(np.mean(Y), color=\"red\", linestyle=\"--\", label=f\"Sample mean = {np.mean(Y):.2f}\")\n",
+        "plt.title(\"Log-Likelihood of Poisson Model vs. λ\")\n",
+        "plt.xlabel(\"λ\")\n",
+        "plt.ylabel(\"Log-Likelihood\")\n",
+        "plt.legend()\n",
+        "plt.grid(True)\n",
+        "plt.tight_layout()\n",
+        "plt.show()"
+      ],
+      "id": "a515cc5e",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "#### Using first derivative to solve lambda\n",
+        "\n",
+        "To estimate $\\lambda$ in the Poisson model, we begin by writing the log-likelihood function:\n",
+        "\n",
+        "$$\n",
+        "\\ell(\\lambda) = -n\\lambda + \\left( \\sum_{i=1}^{n} y_i \\right) \\log \\lambda - \\sum_{i=1}^{n} \\log y_i!\n",
+        "$$\n",
+        "\n",
+        "Taking the derivative with respect to $\\lambda$:\n",
+        "\n",
+        "$$\n",
+        "\\frac{d\\ell}{d\\lambda} = -n + \\frac{\\sum y_i}{\\lambda}\n",
+        "$$\n",
+        "\n",
+        "Setting the derivative equal to zero:\n",
+        "\n",
+        "$$\n",
+        "-n + \\frac{\\sum y_i}{\\lambda} = 0 \\Rightarrow \\hat{\\lambda} = \\frac{1}{n} \\sum y_i\n",
+        "$$\n",
+        "\n",
+        "Thus, the MLE of $\\lambda$ is the sample mean.\n",
+        "\n",
+        "#### Using scipy.optimize to find MLE"
+      ],
+      "id": "7e96737b"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "initial_guess = [1.0]\n",
+        "\n",
+        "def neg_log_likelihood_poisson(lmbda, y):\n",
+        "  if lmbda <= 0:\n",
+        "        return -np.inf\n",
+        "  n = len(y)\n",
+        "  return -(-n * lmbda + np.sum(y) * np.log(lmbda) - np.sum(gammaln(y + 1)))\n",
+        "result = minimize(neg_log_likelihood_poisson, x0=initial_guess, args=(Y,), bounds=[(1e-6, None)])\n",
+        "\n",
+        "lambda_mle = result.x[0]\n",
+        "print(f\"MLE for λ: {lambda_mle:.4f}\")\n",
+        "print(f\"Sample mean: {np.mean(Y):.4f}\")"
+      ],
+      "id": "472b0e3f",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### Estimation of Poisson Regression Model\n",
+        "\n",
+        "Next, we extend our simple Poisson model to a Poisson Regression Model such that $Y_i = \\text{Poisson}(\\lambda_i)$ where $\\lambda_i = \\exp(X_i'\\beta)$. The interpretation is that the success rate of patent awards is not constant across all firms ($\\lambda$) but rather is a function of firm characteristics $X_i$. Specifically, we will use the covariates age, age squared, region, and whether the firm is a customer of Blueprinty.\n",
+        "\n",
+        "*todo: Update your likelihood or log-likelihood function with an additional argument to take in a covariate matrix X. Also change the parameter of the model from lambda to the beta vector. In this model, lambda must be a positive number, so we choose the inverse link function g_inv() to be exp() so that* $\\lambda_i = e^{X_i'\\beta}$. *For example:*"
+      ],
+      "id": "e147812d"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def poisson_regression_likelihood(beta, Y, X):\n",
+        "  eta = X @ beta              \n",
+        "  lambdas = np.exp(eta)       \n",
+        "  loglik = -np.sum(lambdas) + np.sum(y * eta) - np.sum(gammaln(y + 1))\n",
+        "  return loglik               "
+      ],
+      "id": "334fdb7d",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "#### Using scipy.optimize to find the MLE"
+      ],
+      "id": "9dad7cdb"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "from scipy.optimize import minimize\n",
+        "import numpy as np\n",
+        "import pandas as pd\n",
+        "from scipy.special import gammaln\n",
+        "\n",
+        "def neg_poisson_regression_likelihood(beta, X, y):\n",
+        "    eta = np.dot(X, beta)\n",
+        "    eta = np.clip(eta, -20, 20)\n",
+        "    lambdas = np.exp(eta)\n",
+        "    loglik = -np.sum(lambdas) + np.dot(y, eta) - np.sum(gammaln(y + 1))\n",
+        "    return -loglik\n",
+        "\n",
+        "blueprinty[\"age_squared\"] = blueprinty[\"age\"] ** 2\n",
+        "\n",
+        "from sklearn.preprocessing import StandardScaler\n",
+        "numeric_cols = [\"age\", \"age_squared\", \"iscustomer\"]\n",
+        "scaler = StandardScaler()\n",
+        "blueprinty[numeric_cols] = scaler.fit_transform(blueprinty[numeric_cols])\n",
+        "\n",
+        "region_dummies = pd.get_dummies(blueprinty[\"region\"], drop_first=True)\n",
+        "\n",
+        "X = pd.concat([\n",
+        "    pd.Series(1.0, index=blueprinty.index, name=\"Intercept\"),\n",
+        "    blueprinty[[\"age\", \"age_squared\"]],\n",
+        "    region_dummies,\n",
+        "    blueprinty[[\"iscustomer\"]]\n",
+        "], axis=1)\n",
+        "\n",
+        "X_names = X.columns.tolist()\n",
+        "X = X.astype(float).values\n",
+        "y = blueprinty[\"patents\"].astype(float).values\n",
+        "\n",
+        "init_beta = np.zeros(X.shape[1])\n",
+        "\n",
+        "result = minimize(neg_poisson_regression_likelihood, x0=init_beta, args=(X,y), method=\"L-BFGS-B\")\n",
+        "beta_hat = result.x\n",
+        "hessian_inv_mat = result.hess_inv.todense() \n",
+        "standard_errors = np.sqrt(np.diag(hessian_inv_mat))\n",
+        "\n",
+        "coef_table = pd.DataFrame({\n",
+        "    \"Coefficient\": beta_hat,\n",
+        "    \"Std. Error\": standard_errors\n",
+        "}, index=X_names)\n",
+        "\n",
+        "print(coef_table.round(4))"
+      ],
+      "id": "d1e44377",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "#### Using Python sm.GLM()"
+      ],
+      "id": "e2d7f618"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import statsmodels.api as sm\n",
+        "import statsmodels.formula.api as smf\n",
+        "\n",
+        "model_std = smf.glm(\n",
+        "    \"patents ~ age + age_squared + C(region) + iscustomer\",\n",
+        "    data=blueprinty, \n",
+        "    family=sm.families.Poisson()\n",
+        ").fit()\n",
+        "\n",
+        "print(model_std.summary())"
+      ],
+      "id": "62a0dc7d",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "We fit a Poisson regression model to estimate the number of patents awarded to firms based on age, customer status, and region.\n",
+        "\n",
+        "The coefficient on age is significantly positive, while age squared is significantly negative, suggesting a non-linear (inverted-U) relationship between firm age and patenting activity. Firms that are customers of Blueprinty also tend to have significantly more patents.\n",
+        "\n",
+        "Regional differences, however, do not appear to be statistically significant, indicating that patent activity is not strongly driven by firm location.\n",
+        "\n",
+        "#### The average difference between customer and non-customer"
+      ],
+      "id": "0887c30d"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import statsmodels.api as sm\n",
+        "import statsmodels.formula.api as smf\n",
+        "import pandas as pd\n",
+        "\n",
+        "model = smf.glm(\n",
+        "    \"patents ~ age + age_squared + C(region) + iscustomer\",\n",
+        "    data=blueprinty,\n",
+        "    family=sm.families.Poisson()\n",
+        ").fit()\n",
+        "\n",
+        "X_0 = blueprinty.copy()\n",
+        "X_1 = blueprinty.copy()\n",
+        "X_0[\"iscustomer\"] = 0\n",
+        "X_1[\"iscustomer\"] = 1\n",
+        "\n",
+        "y_pred_0 = model.predict(X_0)\n",
+        "y_pred_1 = model.predict(X_1)\n",
+        "\n",
+        "diff = y_pred_1 - y_pred_0\n",
+        "avg_effect = diff.mean()\n",
+        "\n",
+        "print(f\"Average effect of being a customer: {avg_effect:.4f}\")"
+      ],
+      "id": "0a8a5648",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "To evaluate the effect of Blueprinty's software on patenting success, we simulated predicted patent counts under two scenarios: assuming each firm is not a customer, and assuming it is a customer. Holding all other variables constant, we find that becoming a Blueprinty customer increases the expected number of patents by **approximately 0.37** on average.\n",
+        "\n",
+        "This suggests that Blueprinty's product has a meaningful and positive association with innovation outcomes across firms.\n",
+        "\n",
+        "## AirBnB Case Study\n",
+        "\n",
+        "### Introduction\n",
+        "\n",
+        "AirBnB is a popular platform for booking short-term rentals. In March 2017, students Annika Awad, Evan Lebo, and Anna Linden scraped of 40,000 Airbnb listings from New York City. The data include the following variables:\n",
+        "\n",
+        "::: {.callout-note collapse=\"true\"}\n",
+        "### Variable Definitions\n",
+        "\n",
+        "```         \n",
+        "- `id` = unique ID number for each unit\n",
+        "- `last_scraped` = date when information scraped\n",
+        "- `host_since` = date when host first listed the unit on Airbnb\n",
+        "- `days` = `last_scraped` - `host_since` = number of days the unit has been listed\n",
+        "- `room_type` = Entire home/apt., Private room, or Shared room\n",
+        "- `bathrooms` = number of bathrooms\n",
+        "- `bedrooms` = number of bedrooms\n",
+        "- `price` = price per night (dollars)\n",
+        "- `number_of_reviews` = number of reviews for the unit on Airbnb\n",
+        "- `review_scores_cleanliness` = a cleanliness score from reviews (1-10)\n",
+        "- `review_scores_location` = a \"quality of location\" score from reviews (1-10)\n",
+        "- `review_scores_value` = a \"quality of value\" score from reviews (1-10)\n",
+        "- `instant_bookable` = \"t\" if instantly bookable, \"f\" if not\n",
+        "```\n",
+        ":::\n",
+        "\n",
+        "*todo: Assume the number of reviews is a good proxy for the number of bookings. Perform some exploratory data analysis to get a feel for the data, handle or drop observations with missing values on relevant variables, build one or more models (e.g., a poisson regression model for the number of bookings as proxied by the number of reviews), and interpret model coefficients to describe variation in the number of reviews as a function of the variables provided.*\n",
+        "\n",
+        "#### Load the data and check the data"
+      ],
+      "id": "c9ffe855"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import pyrsm as rsm\n",
+        "import pandas as pd\n",
+        "\n",
+        "df = pd.read_csv('airbnb.csv')\n",
+        "df.head()"
+      ],
+      "id": "a3f40296",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "#### Check summary statistics of the dataset"
+      ],
+      "id": "f20d993b"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "print(df.describe().round(2))\n",
+        "print(df.info())"
+      ],
+      "id": "b5dc3af2",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "#### Distribution plot of the dataset"
+      ],
+      "id": "2543714d"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "fig = rsm.distr_plot(data=df)"
+      ],
+      "id": "5416b4df",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "#### Build models and check coefficients"
+      ],
+      "id": "6a691187"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "df = df.drop(columns=[\"Unnamed: 0\", \"id\"])\n",
+        "\n",
+        "df[\"last_scraped\"] = pd.to_datetime(df[\"last_scraped\"], errors=\"coerce\")\n",
+        "df[\"host_since\"] = pd.to_datetime(df[\"host_since\"], errors=\"coerce\")\n",
+        "df[\"host_duration\"] = (df[\"last_scraped\"] - df[\"host_since\"]).dt.days\n",
+        "\n",
+        "df[\"instant_bookable\"] = df[\"instant_bookable\"].map({\"t\": 1, \"f\": 0})\n",
+        "\n",
+        "model_vars = [\n",
+        "    \"number_of_reviews\", \"price\", \"room_type\", \"bathrooms\", \"bedrooms\",\n",
+        "    \"review_scores_cleanliness\", \"review_scores_location\", \"review_scores_value\",\n",
+        "    \"instant_bookable\", \"host_duration\"\n",
+        "]\n",
+        "df_model = df[model_vars].dropna()\n",
+        "\n",
+        "formula = \"\"\"\n",
+        "number_of_reviews ~ price + C(room_type) + bathrooms + bedrooms + \n",
+        "review_scores_cleanliness + review_scores_location + review_scores_value + \n",
+        "instant_bookable + host_duration\n",
+        "\"\"\"\n",
+        "poisson_model = smf.glm(\n",
+        "    formula=formula,\n",
+        "    data=df_model,\n",
+        "    family=sm.families.Poisson()\n",
+        ").fit()\n",
+        "\n",
+        "print(poisson_model.summary())"
+      ],
+      "id": "bb107c33",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "The Poisson regression model reveals several significant relationships between listing characteristics and the number of reviews, which serves as a proxy for bookings. Among the most influential factors, instant bookable listings are associated with approximately 58% more reviews than those that are not, indicating the convenience of instant booking likely drives higher customer engagement. Additionally, host duration (the length of time a host has been active) shows a positive effect, where each additional day is linked to a small but consistent 0.05% increase in reviews, reflecting the importance of host experience over time.\n",
+        "\n",
+        "Cleanliness ratings play a strong role as well: for every one-point increase in review_scores_cleanliness, the expected number of reviews rises by 12%, underscoring how perceived cleanliness boosts customer trust and demand. Listings with more bedrooms also see more reviews, with each additional bedroom linked to an 8% increase. In contrast, more bathrooms are surprisingly associated with fewer reviews, which could reflect specific property types or customer expectations.\n",
+        "\n",
+        "Price has a modest negative relationship with reviews: for every \\$100 increase in nightly rate, the number of reviews is expected to decline by about 4%, consistent with the idea that higher prices may limit the booking volume. Interestingly, review_scores_location and review_scores_value both show negative associations with review count, suggesting that highly rated properties in these areas may rely less on volume and more on perceived quality or exclusivity.\n",
+        "\n",
+        "Overall, the results suggest that ease of booking, host tenure, cleanliness, and property configuration are key drivers of booking volume, while price sensitivity and certain customer ratings reflect more nuanced dynamics.\n",
+        "\n",
+        "#### Check multicollinearity"
+      ],
+      "id": "bc68591e"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "from statsmodels.stats.outliers_influence import variance_inflation_factor\n",
+        "from patsy import dmatrices\n",
+        "\n",
+        "formula = \"\"\"\n",
+        "number_of_reviews ~ price + C(room_type) + bathrooms + bedrooms +\n",
+        "review_scores_cleanliness + review_scores_location + review_scores_value +\n",
+        "instant_bookable + host_duration\n",
+        "\"\"\"\n",
+        "y, X = dmatrices(formula, data=df_model, return_type='dataframe')\n",
+        "\n",
+        "vif_df = pd.DataFrame()\n",
+        "vif_df[\"variable\"] = X.columns\n",
+        "vif_df[\"VIF\"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]\n",
+        "\n",
+        "print(vif_df)"
+      ],
+      "id": "ca8765b9",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "To assess multicollinearity among the independent variables, we computed the Variance Inflation Factor (VIF) for each predictor in the Poisson regression model. All VIF values were well below the commonly accepted threshold of 5, with the highest being approximately 1.82 for review_scores_value. This suggests that there is no significant multicollinearity present among the variables.\n",
+        "\n",
+        "Low VIF values indicate that the predictors are not highly correlated with one another, which supports the stability and reliability of the estimated regression coefficients. Therefore, we can be confident that the individual effects of the variables on the number of reviews are being appropriately captured by the model, without distortion from redundant or highly correlated predictors."
+      ],
+      "id": "d40fb54e"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "py3127",
+      "language": "python",
+      "display_name": "Python 3.12.7",
+      "path": "/home/jovyan/.rsm-msba/share/jupyter/kernels/py3127"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

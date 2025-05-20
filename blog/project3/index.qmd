@@ -66,8 +66,7 @@ where the variables are binary indicators and $\varepsilon$ is Type 1 Extreme Va
 
 The "hard part" of the MNL likelihood function is organizing the data, as we need to keep track of 3 dimensions (consumer $i$, covariate $k$, and product $j$) instead of the typical 2 dimensions for cross-sectional regression models (consumer $i$ and covariate $k$). The fact that each task for each respondent has the same number of alternatives (3) helps. In addition, we need to convert the categorical variables for brand and ads into binary variables.
 
-*todo: reshape and prep the data*
-
+### Reshape and prepare the data
 ```{python}
 import pandas as pd
 conjoint_data = pd.read_csv("conjoint_data.csv")
@@ -90,10 +89,7 @@ print(X_prep.head(10))
 
 ## 4. Estimation via Maximum Likelihood
 
-*todo: Code up the log-likelihood function.*
-
-*todo: Use `optim()` in R or `scipy.optimize()` in Python to find the MLEs for the 4 parameters (*$\beta_\text{netflix}$, $\beta_\text{prime}$, $\beta_\text{ads}$, $\beta_\text{price}$), as well as their standard errors (from the Hessian). For each parameter construct a 95% confidence interval.
-
+### Log-likelood function and optimize with scipy.optimize()
 ```{python}
 import pandas as pd
 import numpy as np
@@ -143,14 +139,7 @@ print(results_df)
 
 ## 5. Estimation via Bayesian Methods
 
-*todo: code up a metropolis-hasting MCMC sampler of the posterior distribution. Take 11,000 steps and throw away the first 1,000, retaining the subsequent 10,000.*
-
-*hint: Use N(0,5) priors for the betas on the binary variables, and a N(0,1) prior for the price beta.*
-
-\_hint: instead of calculating post=lik\*prior, you can work in the log-space and calculate log-post = log-lik + log-prior (this should enable you to re-use your log-likelihood function from the MLE section just above)\_
-
-*hint: King Markov (in the video) use a candidate distribution of a coin flip to decide whether to move left or right among his islands. Unlike King Markov, we have 4 dimensions (because we have 4 betas) and our dimensions are continuous. So, use a multivariate normal distribution to pospose the next location for the algorithm to move to. I recommend a MNV(mu, Sigma) where mu=c(0,0,0,0) and sigma has diagonal values c(0.05, 0.05, 0.05, 0.005) and zeros on the off-diagonal. Since this MVN has no covariances, you can sample each dimension independently (so 4 univariate normals instead of 1 multivariate normal), where the first 3 univariate normals are N(0,0.05) and the last one if N(0,0.005).*
-
+### Metropolis-hasting MCMC sampler
 ```{python}
 def log_likelihood(beta):
     ll = 0
@@ -161,30 +150,30 @@ def log_likelihood(beta):
         y_block = y[start:end]
         v = np.dot(X_block, beta)
         v = np.atleast_1d(v).astype(float)
-        exp_v = np.exp(v - np.max(v))  # 数值稳定性
+        exp_v = np.exp(v - np.max(v)) 
         prob = exp_v / exp_v.sum()
         if np.any(y_block == 1):
             ll += np.log(prob[y_block == 1][0])
     return ll
 
-# 2. log-prior 函数
+# log-prior function
 def log_prior(beta):
     return -0.5 * ((beta[0:3]**2).sum() / 5 + beta[3]**2)
 
 def log_posterior(beta):
     return log_likelihood(beta) + log_prior(beta)
 
-# 4. MCMC 参数
+# MCMC parameter
 n_steps = 11000
 burn_in = 1000
 posterior_samples = np.zeros((n_steps, 4))
 current_beta = np.zeros(4)
 current_log_post = log_posterior(current_beta)
 
-# 5. proposal 分布（独立正态噪声）
+# Proposal distribution
 proposal_sd = np.array([np.sqrt(0.05), np.sqrt(0.05), np.sqrt(0.05), np.sqrt(0.005)])
 
-# 6. MCMC 主循环
+# MCMC main iteration
 for step in range(n_steps):
     proposal = current_beta + np.random.normal(0, proposal_sd)
     proposal_log_post = log_posterior(proposal)
@@ -196,12 +185,9 @@ for step in range(n_steps):
     
     posterior_samples[step] = current_beta
 
-# 7. 丢弃 burn-in 样本，保留 10,000 后验样本
 posterior_samples = posterior_samples[burn_in:]
 ```
 
-
-*todo: for at least one of the 4 parameters, show the trace plot of the algorithm, as well as the histogram of the posterior distribution.*
 
 ### Trace Plot
 ```{python}
@@ -227,7 +213,8 @@ plt.tight_layout()
 plt.show()
 ```
 
-*todo: report the 4 posterior means, standard deviations, and 95% credible intervals and compare them to your results from the Maximum Likelihood approach.*
+
+### Final Results
 ```{python}
 param_names = results_df["Parameter"].tolist()
 
@@ -251,20 +238,13 @@ print(comparison_df)
 The Maximum Likelihood Estimation (MLE) and Bayesian Metropolis-Hastings MCMC approaches produced broadly consistent results across all four parameters in the model: brand_N, brand_P, ad_Yes, and price. The point estimates from MLE and the posterior means from MCMC were nearly identical, with differences generally within 0.01–0.02, indicating strong agreement in central tendency. However, the MCMC approach provides a fuller picture of uncertainty. While MLE standard errors and confidence intervals rely on approximations using the curvature of the likelihood (via the Hessian), the MCMC-derived posterior standard deviations and 95% credible intervals are based on the actual sampled distribution of parameter values. This is particularly valuable for interpreting parameters like price, where the credible interval can be directly interpreted as the probability that the parameter lies within a specific range, something the frequentist confidence interval cannot offer. Overall, the MCMC method supports and complements the MLE results while offering a more intuitive and informative description of parameter uncertainty.
 
 ## 6. Discussion
+If we didn’t know that the data were simulated, we could still draw meaningful conclusions from the model estimates. First, the fact that \beta\text{Netflix} \> \beta\text{Prime} suggests that, holding advertising and price constant, users tend to prefer Netflix over Prime. This can be interpreted as Netflix having a stronger brand effect, or users perceiving more value in Netflix’s offerings.
 
-*todo: Suppose you did not simulate the data. What do you observe about the parameter estimates? What does* $\beta_\text{Netflix} > \beta_\text{Prime}$ mean? Does it make sense that $\beta_\text{price}$ is negative?
-
-If we didn’t know that the data were simulated, we could still draw meaningful conclusions from the model estimates. First, the fact that \beta_\text{Netflix} > \beta_\text{Prime} suggests that, holding advertising and price constant, users tend to prefer Netflix over Prime. This can be interpreted as Netflix having a stronger brand effect, or users perceiving more value in Netflix’s offerings.
-
-Additionally, the estimate for \beta_\text{price} is negative, which indicates that as the price increases, the utility of a product decreases. This aligns perfectly with economic intuition—higher prices make an option less likely to be chosen. The model successfully captures price sensitivity, adding to its explanatory power and credibility.
+Additionally, the estimate for \beta\_\text{price} is negative, which indicates that as the price increases, the utility of a product decreases. This aligns perfectly with economic intuition—higher prices make an option less likely to be chosen. The model successfully captures price sensitivity, adding to its explanatory power and credibility.
 
 Overall, even without knowing the data were simulated, the estimated parameters have clear behavioral interpretations. This suggests that the multinomial logit (MNL) model is appropriate for the data, and that the parameter estimates are stable and interpretable. It also highlights the effectiveness of discrete choice models in capturing user preferences.
 
 
+To simulate data from — and estimate parameters of — a multi-level (also known as random-parameter or hierarchical) model, we would need to modify both the data-generating process and the estimation approach to account for individual-level heterogeneity. Instead of assuming a single shared set of \beta parameters for all respondents (as in the standard MNL), we would assume that each respondent i has their own \beta\_i, drawn from a higher-level population distribution, such as \beta\_i \sim \mathcal{N}(\mu, \Sigma). This allows for variation in preferences across individuals.
 
-
-*todo: At a high level, discuss what change you would need to make in order to simulate data from --- and estimate the parameters of --- a multi-level (aka random-parameter or hierarchical) model. This is the model we use to analyze "real world" conjoint data.*
-
-To simulate data from — and estimate parameters of — a multi-level (also known as random-parameter or hierarchical) model, we would need to modify both the data-generating process and the estimation approach to account for individual-level heterogeneity. Instead of assuming a single shared set of \beta parameters for all respondents (as in the standard MNL), we would assume that each respondent i has their own \beta_i, drawn from a higher-level population distribution, such as \beta_i \sim \mathcal{N}(\mu, \Sigma). This allows for variation in preferences across individuals.
-
-To simulate such data, we would first draw a \beta_i for each respondent from the population distribution, then simulate choices based on those respondent-specific coefficients. For estimation, we would shift from maximum likelihood to Bayesian methods such as Hierarchical Bayes (HB) or use frequentist approaches like Mixed Logit via simulated maximum likelihood. These methods allow us to estimate both the population-level parameters (\mu, \Sigma) and the individual-level betas, making the model better suited for analyzing real-world conjoint data where heterogeneity in consumer preferences is expected and important to capture.
+To simulate such data, we would first draw a \beta\_i for each respondent from the population distribution, then simulate choices based on those respondent-specific coefficients. For estimation, we would shift from maximum likelihood to Bayesian methods such as Hierarchical Bayes (HB) or use frequentist approaches like Mixed Logit via simulated maximum likelihood. These methods allow us to estimate both the population-level parameters (\mu, \Sigma) and the individual-level betas, making the model better suited for analyzing real-world conjoint data where heterogeneity in consumer preferences is expected and important to capture.
