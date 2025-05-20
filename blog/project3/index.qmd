@@ -1,7 +1,7 @@
 ---
 title: "Multinomial Logit Model"
 author: "Yichen Wu"
-date: today
+date: 20-03-2025
 jupyter: py3127
 format:
   html:
@@ -150,12 +150,120 @@ print(results_df)
 
 *hint: King Markov (in the video) use a candidate distribution of a coin flip to decide whether to move left or right among his islands. Unlike King Markov, we have 4 dimensions (because we have 4 betas) and our dimensions are continuous. So, use a multivariate normal distribution to pospose the next location for the algorithm to move to. I recommend a MNV(mu, Sigma) where mu=c(0,0,0,0) and sigma has diagonal values c(0.05, 0.05, 0.05, 0.005) and zeros on the off-diagonal. Since this MVN has no covariances, you can sample each dimension independently (so 4 univariate normals instead of 1 multivariate normal), where the first 3 univariate normals are N(0,0.05) and the last one if N(0,0.005).*
 
+```{python}
+def log_likelihood(beta):
+    ll = 0
+    for i in range(len(group_bounds) - 1):
+        start = group_bounds[i]
+        end = group_bounds[i+1]
+        X_block = X[start:end]
+        y_block = y[start:end]
+        v = np.dot(X_block, beta)
+        v = np.atleast_1d(v).astype(float)
+        exp_v = np.exp(v - np.max(v))  # 数值稳定性
+        prob = exp_v / exp_v.sum()
+        if np.any(y_block == 1):
+            ll += np.log(prob[y_block == 1][0])
+    return ll
+
+# 2. log-prior 函数
+def log_prior(beta):
+    return -0.5 * ((beta[0:3]**2).sum() / 5 + beta[3]**2)
+
+def log_posterior(beta):
+    return log_likelihood(beta) + log_prior(beta)
+
+# 4. MCMC 参数
+n_steps = 11000
+burn_in = 1000
+posterior_samples = np.zeros((n_steps, 4))
+current_beta = np.zeros(4)
+current_log_post = log_posterior(current_beta)
+
+# 5. proposal 分布（独立正态噪声）
+proposal_sd = np.array([np.sqrt(0.05), np.sqrt(0.05), np.sqrt(0.05), np.sqrt(0.005)])
+
+# 6. MCMC 主循环
+for step in range(n_steps):
+    proposal = current_beta + np.random.normal(0, proposal_sd)
+    proposal_log_post = log_posterior(proposal)
+    accept_prob = np.exp(proposal_log_post - current_log_post)
+    
+    if np.random.rand() < accept_prob:
+        current_beta = proposal
+        current_log_post = proposal_log_post
+    
+    posterior_samples[step] = current_beta
+
+# 7. 丢弃 burn-in 样本，保留 10,000 后验样本
+posterior_samples = posterior_samples[burn_in:]
+```
+
+
 *todo: for at least one of the 4 parameters, show the trace plot of the algorithm, as well as the histogram of the posterior distribution.*
 
+```{python}
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(12, 5))
+
+# Trace plot for price
+plt.subplot(1, 2, 1)
+plt.plot(posterior_samples[:, 3], color='blue', alpha=0.7)
+plt.title("Trace Plot for price")
+plt.xlabel("Iteration")
+plt.ylabel("Value")
+
+# Histogram of posterior for price
+plt.subplot(1, 2, 2)
+plt.hist(posterior_samples[:, 3], bins=40, color='skyblue', edgecolor='black', density=True)
+plt.title("Posterior Distribution of price")
+plt.xlabel("Value")
+plt.ylabel("Density")
+
+plt.tight_layout()
+plt.show()
+
+```
+
 *todo: report the 4 posterior means, standard deviations, and 95% credible intervals and compare them to your results from the Maximum Likelihood approach.*
+```{python}
+param_names = results_df["Parameter"].tolist()
+
+posterior_means = posterior_samples.mean(axis=0)
+posterior_stds = posterior_samples.std(axis=0)
+posterior_ci_lower = np.percentile(posterior_samples, 2.5, axis=0)
+posterior_ci_upper = np.percentile(posterior_samples, 97.5, axis=0)
+
+posterior_df = pd.DataFrame({
+    "Parameter": param_names,
+    "Posterior Mean": posterior_means,
+    "Posterior Std": posterior_stds,
+    "Posterior 2.5%": posterior_ci_lower,
+    "Posterior 97.5%": posterior_ci_upper
+})
+
+comparison_df = pd.merge(results_df, posterior_df, on="Parameter")
+print(comparison_df)
+```
+
+The Maximum Likelihood Estimation (MLE) and Bayesian Metropolis-Hastings MCMC approaches produced broadly consistent results across all four parameters in the model: brand_N, brand_P, ad_Yes, and price. The point estimates from MLE and the posterior means from MCMC were nearly identical, with differences generally within 0.01–0.02, indicating strong agreement in central tendency. However, the MCMC approach provides a fuller picture of uncertainty. While MLE standard errors and confidence intervals rely on approximations using the curvature of the likelihood (via the Hessian), the MCMC-derived posterior standard deviations and 95% credible intervals are based on the actual sampled distribution of parameter values. This is particularly valuable for interpreting parameters like price, where the credible interval can be directly interpreted as the probability that the parameter lies within a specific range, something the frequentist confidence interval cannot offer. Overall, the MCMC method supports and complements the MLE results while offering a more intuitive and informative description of parameter uncertainty.
 
 ## 6. Discussion
 
 *todo: Suppose you did not simulate the data. What do you observe about the parameter estimates? What does* $\beta_\text{Netflix} > \beta_\text{Prime}$ mean? Does it make sense that $\beta_\text{price}$ is negative?
 
+If we didn’t know that the data were simulated, we could still draw meaningful conclusions from the model estimates. First, the fact that \beta_\text{Netflix} > \beta_\text{Prime} suggests that, holding advertising and price constant, users tend to prefer Netflix over Prime. This can be interpreted as Netflix having a stronger brand effect, or users perceiving more value in Netflix’s offerings.
+
+Additionally, the estimate for \beta_\text{price} is negative, which indicates that as the price increases, the utility of a product decreases. This aligns perfectly with economic intuition—higher prices make an option less likely to be chosen. The model successfully captures price sensitivity, adding to its explanatory power and credibility.
+
+Overall, even without knowing the data were simulated, the estimated parameters have clear behavioral interpretations. This suggests that the multinomial logit (MNL) model is appropriate for the data, and that the parameter estimates are stable and interpretable. It also highlights the effectiveness of discrete choice models in capturing user preferences.
+
+
+
+
 *todo: At a high level, discuss what change you would need to make in order to simulate data from --- and estimate the parameters of --- a multi-level (aka random-parameter or hierarchical) model. This is the model we use to analyze "real world" conjoint data.*
+
+To simulate data from — and estimate parameters of — a multi-level (also known as random-parameter or hierarchical) model, we would need to modify both the data-generating process and the estimation approach to account for individual-level heterogeneity. Instead of assuming a single shared set of \beta parameters for all respondents (as in the standard MNL), we would assume that each respondent i has their own \beta_i, drawn from a higher-level population distribution, such as \beta_i \sim \mathcal{N}(\mu, \Sigma). This allows for variation in preferences across individuals.
+
+To simulate such data, we would first draw a \beta_i for each respondent from the population distribution, then simulate choices based on those respondent-specific coefficients. For estimation, we would shift from maximum likelihood to Bayesian methods such as Hierarchical Bayes (HB) or use frequentist approaches like Mixed Logit via simulated maximum likelihood. These methods allow us to estimate both the population-level parameters (\mu, \Sigma) and the individual-level betas, making the model better suited for analyzing real-world conjoint data where heterogeneity in consumer preferences is expected and important to capture.
