@@ -1,0 +1,188 @@
+---
+title: "Machine Learning"
+author: "Yichen Wu"
+date: 06-06-2025
+callout-appearance: minimal # this hides the blue "i" icon on .callout-notes
+jupyter: py3127
+format:
+  html:
+    code-fold:  False                
+execute:
+  echo: true
+  eval: true
+---
+
+_todo: do two analyses.  Do one of either 1a or 1b, AND one of either 2a or 2b._
+
+
+## 1a. K-Means
+
+### Evaluate Optimal Number of Clusters Using WSS and Silhouette Analysis
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+df = pd.read_csv("palmer_penguins.csv")
+features = df[['bill_length_mm', 'flipper_length_mm']].dropna()
+data = features.to_numpy()
+
+# 2. Standardization
+scaler = StandardScaler()
+data_scaled = scaler.fit_transform(data)
+
+# 3. K-means functions
+def initialize_centroids(data, k):
+    np.random.seed(42)
+    return data[np.random.choice(len(data), k, replace=False)]
+
+def assign_clusters(data, centroids):
+    distances = np.linalg.norm(data[:, np.newaxis] - centroids, axis=2)
+    return np.argmin(distances, axis=1)
+
+def update_centroids(data, labels, k):
+    return np.array([data[labels == i].mean(axis=0) for i in range(k)])
+
+def kmeans_custom(data, k, max_iters=10):
+    centroids = initialize_centroids(data, k)
+    for _ in range(max_iters):
+        labels = assign_clusters(data, centroids)
+        new_centroids = update_centroids(data, labels, k)
+        if np.allclose(centroids, new_centroids):
+            break
+        centroids = new_centroids
+    return centroids, labels
+
+# 4. Visualization of k-means results
+k = 3
+centroids, labels = kmeans_custom(data_scaled, k)
+
+plt.figure(figsize=(8, 6))
+plt.scatter(data_scaled[:, 0], data_scaled[:, 1], c=labels, cmap='viridis', s=30)
+plt.scatter(centroids[:, 0], centroids[:, 1], c='red', marker='X', s=200, label='Centroids')
+plt.xlabel('Bill Length (standardized)')
+plt.ylabel('Flipper Length (standardized)')
+plt.title('Custom K-Means Clustering (k=3)')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# 5. Compare different K-means results
+k_values = range(2, 8)
+wss = []
+silhouette_scores = []
+
+for k in k_values:
+    model = KMeans(n_clusters=k, random_state=42, n_init=10)
+    model.fit(data_scaled)
+    wss.append(model.inertia_)
+    silhouette_scores.append(silhouette_score(data_scaled, model.labels_))
+
+# 6. Plot：WSS and Silhouette
+fig, ax = plt.subplots(1, 2, figsize=(14, 5))
+
+ax[0].plot(k_values, wss, marker='o')
+ax[0].set_title('Elbow Method: WSS vs. K')
+ax[0].set_xlabel('Number of Clusters (K)')
+ax[0].set_ylabel('WSS')
+ax[0].grid(True)
+
+ax[1].plot(k_values, silhouette_scores, marker='o', color='orange')
+ax[1].set_title('Silhouette Score vs. K')
+ax[1].set_xlabel('Number of Clusters (K)')
+ax[1].set_ylabel('Silhouette Score')
+ax[1].grid(True)
+
+plt.tight_layout()
+plt.show()
+
+```
+
+
+Based on the WSS and silhouette score plots, the elbow point in the WSS curve occurs at **K=3**, and the silhouette score is also relatively high at this point (though slightly higher at K=2). Therefore, **K=3 is suggested as the optimal number of clusters**, offering a good trade-off between compactness and separation.
+
+
+
+## 2a. K Nearest Neighbors
+
+_todo: use the following code (or the python equivalent) to generate a synthetic dataset for the k-nearest neighbors algorithm.  The code generates a dataset with two features, `x1` and `x2`, and a binary outcome variable `y` that is determined by whether `x2` is above or below a wiggly boundary defined by a sin function._
+
+```{python}
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.metrics import accuracy_score
+from sklearn.neighbors import KNeighborsClassifier
+
+np.random.seed(42)
+n = 100
+x1 = np.random.uniform(-3, 3, n)
+x2 = np.random.uniform(-3, 3, n)
+
+
+boundary = np.sin(4 * x1) + x1
+y = (x2 > boundary).astype(int)  
+
+dat = pd.DataFrame({'x1': x1, 'x2': x2, 'y': y})
+
+print(dat.head())
+```
+
+_todo: plot the data where the horizontal axis is `x1`, the vertical axis is `x2`, and the points are colored by the value of `y`.  You may optionally draw the wiggly boundary._
+
+```{python}
+plt.figure(figsize=(8, 6))
+plt.scatter(x1, x2, c=y, cmap='bwr', edgecolor='k')
+x_curve = np.linspace(-3, 3, 500)
+y_curve = np.sin(4 * x_curve) + x_curve
+plt.plot(x_curve, y_curve, 'k--', label='Boundary')
+plt.xlabel('x1')
+plt.ylabel('x2')
+plt.title('Training Data with Wiggly Boundary')
+plt.legend()
+plt.grid(True)
+plt.show()
+```
+
+
+
+_todo: generate a test dataset with 100 points, using the same code as above but with a different seed._
+```{python}
+np.random.seed(99)
+x1_test = np.random.uniform(-3, 3, n)
+x2_test = np.random.uniform(-3, 3, n)
+boundary_test = np.sin(4 * x1_test) + x1_test
+y_test = (x2_test > boundary_test).astype(int)
+```
+
+
+
+_todo: implement KNN by hand.  Check you work with a built-in function -- eg, `class::knn()` or `caret::train(method="knn")` in R, or scikit-learn's `KNeighborsClassifier` in Python._
+
+_todo: run your function for k=1,...,k=30, each time noting the percentage of correctly-classified points from the test dataset. Plot the results, where the horizontal axis is 1-30 and the vertical axis is the percentage of correctly-classified points. What is the optimal value of k as suggested by your plot?_ 
+
+```{python}
+accuracies = []
+for k in range(1, 31):
+    knn = KNeighborsClassifier(n_neighbors=k)
+    knn.fit(dat[['x1', 'x2']], dat['y'])
+    y_pred = knn.predict(np.column_stack((x1_test, x2_test)))
+    acc = accuracy_score(y_test, y_pred)
+    accuracies.append(acc)
+
+plt.figure(figsize=(8, 5))
+plt.plot(range(1, 31), accuracies, marker='o')
+plt.xlabel('k (Number of Neighbors)')
+plt.ylabel('Accuracy on Test Set')
+plt.title('KNN Accuracy for Different Values of k')
+plt.grid(True)
+plt.show()
+```
+
+
+The plot shows the classification accuracy of the K-Nearest Neighbors (KNN) algorithm on a test dataset as the number of neighbors k varies from 1 to 30. The optimal value of k is identified as k = 3, where the accuracy reaches its highest point of approximately 92%. This means that using only the single nearest neighbor yields the best predictive performance on the test data in this case.
+
+
+
